@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+staticfiles/
+# Flutter / Dart
+app/.dart_tool/
+app/build/
+app/.flutter-plugins*
+app/.packages
+app/android/.gradle/
+app/android/local.properties
+app/android/key.properties
+*.jks
+*.keystore
+# Env / secrets
+.env
+.env.*
+!.env.example
+# Local data
+*.sqlite3
+media/
+data/raw/
+models/*.onnx
+models/*.joblib
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,40 @@
+[project]
+name = "good-news-backend"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+  "django>=5.1,<5.3",
+  "djangorestframework>=3.15",
+  "django-filter>=24.3",
+  "psycopg[binary]>=3.2",
+  "dj-database-url>=2.2",
+  "celery[redis]>=5.4",
+  "feedparser>=6.0",
+  "httpx>=0.27",
+  "beautifulsoup4>=4.12",
+  "lxml>=5.2",
+  "langdetect>=1.0.9",
+  "python-dateutil>=2.9",
+  "gunicorn>=22.0",
+  "django-cors-headers>=4.4",
+]
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-django>=4.8", "respx>=0.21", "ruff>=0.6", "mypy>=1.11", "django-stubs>=5"]
+
+[project.optional-dependencies]
+# Local embeddings for deduplication (Phase 3). No external API required.
+embeddings = ["sentence-transformers>=3.0"]
+# Local classifier (Phase 6).
+ml = ["scikit-learn>=1.5", "onnxruntime>=1.18", "joblib>=1.4"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "DJ"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["test_*.py"]
