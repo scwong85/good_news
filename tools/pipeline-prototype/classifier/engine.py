@@ -3,6 +3,8 @@
 Portability rules for rules.json (so the Dart port behaves the same):
 - patterns use only features common to Python `re` and Dart `RegExp` (no inline flags, no
   named groups, no possessive quantifiers); flags come from the rule's "flags" ("i" or "").
+- ASCII semantics: patterns are compiled with `re.ASCII`, so `\\b \\w \\d` only know ASCII
+  (what Dart's RegExp does). Whitespace runs in the matched fields are collapsed to one space first.
 - matching is `search` (anywhere in the field), the first match is recorded in the explanation.
 - weights are summed in rule order; the result is clamped to [0, 1] and rounded to 6 places.
 """
@@ -64,8 +66,11 @@ class RulesError(ValueError):
     pass
 
 
+_WHITESPACE = re.compile(r"\s+")
+
+
 def _flags(spec: str) -> int:
-    return re.IGNORECASE if "i" in spec else 0
+    return re.ASCII | (re.IGNORECASE if "i" in spec else 0)
 
 
 def _compile(rule: dict) -> re.Pattern:
@@ -100,7 +105,8 @@ def validate_rules(rules: dict) -> None:
 
 
 def _field(item: Item, name: str) -> str:
-    return getattr(item, name)
+    value = getattr(item, name)
+    return value if name == "url" else _WHITESPACE.sub(" ", value)
 
 
 def _first_match(rule: dict, item: Item) -> str | None:
@@ -138,7 +144,7 @@ def _keyword_matches(table: dict, item: Item) -> dict[str, int]:
     for name, patterns in table.items():
         n = 0
         for pat in patterns:
-            if re.search(pat, item.text, re.IGNORECASE):
+            if re.search(pat, _field(item, "text"), re.IGNORECASE | re.ASCII):
                 n += 1
         if n:
             counts[name] = n

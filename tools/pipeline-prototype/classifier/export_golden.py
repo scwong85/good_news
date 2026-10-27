@@ -113,6 +113,25 @@ def synthetic(rules: dict) -> list[dict]:
             NOW,
         ),
     ]
+    # Regex-semantics edge cases: Python and Dart must agree (ASCII \\b \\w \\d \\s).
+    edge = {
+        "unicode_before_keyword": dict(
+            title="\u00e9war and recovered wetlands restored by volunteers"
+        ),
+        "unicode_after_keyword": dict(title="Wetlands restored\u00e9 and war\u00e9 by volunteers"),
+        "arabic_digits": dict(title="Wetlands restored: \u0664\u0660% more birds"),
+        "nbsp_number_unit": dict(title="Volunteers restored 40\u00a0percent of wetlands"),
+        "accented_text": dict(
+            title="Caf\u00e9 owners launch recycling partnership in Z\u00fcrich",
+            excerpt="R\u00e9duction of 30% in waste.",
+        ),
+        "upper_case": dict(title="WETLANDS RESTORED BY VOLUNTEERS; STUDY FINDS 40% MORE BIRDS"),
+        "long_title": dict(title="Volunteers restored wetlands " * 30),
+        "curly_quotes": dict(title="What We\u2019re Reading: trees"),
+    }
+    for name, kw in edge.items():
+        item = Item(url="https://e.com/a", published_at=fresh, **{**base, **kw})
+        cases.append((name, item, NOW))
     return [_case(i, rules, n, name) for name, i, n in cases]
 
 
