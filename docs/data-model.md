@@ -1,44 +1,29 @@
-# Data Model
+# On-device Data Model (SQLite via Drift)
 
-PostgreSQL 16. All primary keys are UUIDs. List fields are stored as JSON arrays (JSONField) in Phase 1. Timestamps are timezone-aware UTC. The raw payload and normalized article are stored separately.
+Created by Drift migrations in `app/lib/data/db/`. All timestamps are UTC ISO-8601 text or epoch ms. The original server (Postgres) model is archived in `tools/pipeline-prototype/DATA_MODEL.md`.
 
-## Source
-`id, name, homepage_url, rss_url, tier (1-3), trust_score (0-1), language, regions[], active, last_fetched_at, etag, last_modified, fetch_interval_minutes, robots_policy ('respect'), licensing_notes, reviewed_count, created_at, updated_at` (`include_rules`/`exclude_rules` arrive in Phase 2)
+## sources
+`id` (text pk, slug), `name`, `homepage_url`, `rss_url`, `tier` (1-3), `trust_score` (0-1), `language`, `regions` (json), `user_enabled` (bool), `etag`, `last_modified`, `last_fetched_at`, `last_status`, `consecutive_failures`, `backoff_until`.
+Seeded from the bundled source list (generated from `docs/source-allowlist.csv`); only `user_enabled` and fetch bookkeeping change.
 
-## IngestionRun
-`id, source_id, requested_url, started_at, finished_at, status (running|success|partial|failed|skipped), http_status, items_seen, items_created, items_skipped, items_failed, error_message`
-One row per fetch attempt; records success/failure per source.
+## articles
+`id` (text pk = first 16 hex of sha1(canonical_url)), `source_id`, `canonical_url` (unique), `title`, `excerpt`, `published_at`, `fetched_at`, `language`, `regions` (json), `topics` (json), `story_types` (json), `evidence_signals` (json), `constructive_score`, `route` (`today|explore|excluded`), `explanation` (json), `rules_version`, `cluster_id` (nullable), `hidden` (bool).
+Index `(route, published_at desc)`, unique `canonical_url`. Pruned after 30 days unless bookmarked.
 
-## RawItem
-`id, ingestion_run_id, source_id, external_id, payload (jsonb), fetched_at`
-Unique `(source_id, external_id)`. Immutable.
+## daily_picks
+`day` (local date text), `position` (int), `article_id`; pk `(day, position)`. Written once per day; extended when `stories_per_day` increases.
 
-## Article
-`id, source_id, raw_item_id, external_id, canonical_url (unique), title, excerpt, published_at, language, regions[], topics[], story_types[], summary, why_it_matters, evidence_signals[], quality_score, constructive_score, classification_explanation (jsonb), duplicate_of_id, cluster_id, status, review_decision, reviewed_by, rejection_reason, embedding (Phase 3), search_vector (Phase 4), created_at, updated_at`
+## seen
+`article_id` pk, `seen_at`.
 
-### Status machine
-`discovered -> filtered_out | pending_review | approved`
-`pending_review -> approved | rejected`
-`approved -> published -> archived | flagged`
-`flagged -> pending_review`
-Every transition writes an `ArticleStatusEvent(article_id, from, to, actor, reason, created_at)`.
+## bookmarks
+`article_id` pk, `saved_at`, `snapshot` (json: title, excerpt, source name, url, published_at) so saved items survive pruning and work offline.
 
-## ReviewDecision
-`id, article_id, reviewer, decision (approve|reject|edit|archive), rejection_reason, story_types[], topics[], notes, created_at`
-Exported as labeled training data.
+## feedback (local only)
+`id`, `article_id`, `signal` (`useful|too_trivial|not_credible|already_seen|not_for_me|made_my_day`), `created_at`. `not_credible` / report hides the article on this device and lowers ranking for its source.
 
-## ClassificationAudit
-`id, article_id, stage, rules_version, features (jsonb), score, route, created_at`
+## preferences (key-value)
+`stories_per_day` (5-10, default 5), `topics`, `regions`, `sensitivity`, `enabled_sources`, `reminder_time` (optional, local notification), `crash_reports_opt_in` (default false).
 
-## DuplicateCluster
-`id, primary_article_id, created_at`; articles reference `cluster_id`.
-
-## UserFeedback
-`id, anonymous_id, article_id, signal (made_my_day|useful|too_trivial|not_credible|already_seen|not_for_me), created_at`
-`not_credible` feedback beyond a threshold moves the article to `flagged`.
-
-## Anonymous reader state
-`Session(anonymous_id, preferences jsonb, created_at)`, `Bookmark(anonymous_id, article_id, created_at)`. No PII required; deletion endpoint removes all rows for an `anonymous_id`.
-
-## Indexes
-`Article(status, published_at desc)`, GIN on `topics`, `regions`, `search_vector`; unique `canonical_url`.
+## Rules cache
+`rules_version` currently in use; articles classified under an older version are reclassified lazily after an app update (cheap, since stored title/excerpt are enough).

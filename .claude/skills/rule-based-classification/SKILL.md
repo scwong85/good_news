@@ -1,12 +1,12 @@
 ---
 name: rule-based-classification
-description: Implement and tune the transparent rule-based constructive scoring, topic/region rules, and routing.
+description: Transparent rule-based constructive scoring, topic/region/story-type rules and routing, shared by the Python reference and the Dart app via rules/rules.json.
 ---
 
 # Rule-based classification
 
-- Spec: docs/classification-rules.md and docs/editorial-policy.md.
-- Weights/lexicons in versioned config (`scoring.yaml`); code is generic.
-- Every decision stores an explanation: features matched, weights, route, rules_version (`ClassificationAudit`).
-- The score only routes; it never publishes alone. Forced-review cases always win. Nothing is published without passing deterministic Stage 1 checks.
-- Evaluate against data/seed_labels.jsonl (precision/recall/F1 per story type); do not tune on the eval split.
+- Spec: docs/classification-rules.md and docs/editorial-policy.md. Rules live in `rules/rules.json` (single source of truth), synced to `app/assets/rules/` with `scripts/sync-rules.sh`.
+- Input is title + excerpt + feed categories + source metadata only. Output: score, route (`today|explore|excluded`), topics, regions, story_types, evidence_signals, and an explanation (feature, weight, matched text). No randomness, no network.
+- Routing has no human in the loop, so keep `today` conservative (evidence signal or highly trusted source).
+- Change rules only with an evaluation run on data/seed_labels.jsonl (dev/held-out split; never tune on the held-out set). Targets: `today` precision >= 85%, Tier-1 route accuracy >= 80%.
+- Python reference and Dart implementation must agree on every labeled item (parity test).

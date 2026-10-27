@@ -1,14 +1,13 @@
 ---
 name: rss-ingestion
-description: Build or modify RSS/API ingestion for Good News: fetching, parsing, canonicalizing URLs, normalizing, idempotent storage. Use for any ingestion worker work.
+description: Fetching, parsing and normalizing RSS/Atom feeds for Good News (Dart on-device implementation; Python reference in tools/pipeline-prototype).
 ---
 
 # RSS ingestion
 
-- Fetch with `httpx` (timeout, retries with backoff, conditional GET via ETag/Last-Modified), parse with `feedparser`. Send `INGESTION_USER_AGENT`.
-- Implementation lives in `backend/ingestion/` (`urls.py`, `normalize.py`, `fetch.py`, `hooks.py`, `service.py`). Run `before_ingestion` checks (docs/pipeline-hooks.md): source active, licensing note, robots, rate limit.
-- Never crash on malformed feeds: record an `IngestionRun` with status and error, continue to next source.
-- Store the raw payload (`RawItem`) separately from the normalized `Article`.
-- Canonicalize URLs: lowercase host, strip fragments and tracking params (utm_*, fbclid, gclid), upgrade http to https, drop trailing slash (do not fetch article pages to resolve `rel=canonical`; see decision log #15). Unique on canonical_url so reruns never duplicate.
-- Normalize title (whitespace, HTML entities), date (UTC; reject missing), language, regions. Keep only a short excerpt (<= ~300 chars); never store full article body for display.
+- On-device (Dart) spec: docs/architecture.md 'Fetch-on-open flow'; port behaviour from the Python reference in `tools/pipeline-prototype/ingestion/` (`urls.py`, `normalize.py`, `fetch.py`, `service.py`) and its tests.
+- Fetch: identify the app via User-Agent; timeouts, size cap, conditional GET (ETag/Last-Modified), small retry on transport/5xx, back off on 429 with Retry-After. Never crash on malformed feeds; record status per source and continue.
+- Canonicalize URLs: lowercase host, http->https, drop default ports, fragments and tracking params (utm_*, fbclid, gclid, mc_*...), sort query, strip trailing slash. Do not fetch article pages (no rel=canonical resolution).
+- Normalize: strip HTML/entities, NFC, collapse whitespace, remove WordPress 'The post ... appeared first on' boilerplate, excerpt <= 300 chars on a word boundary, UTC dates (skip missing, clamp far-future), language fallback to the source's, topics from feed categories.
+- Idempotent: unique canonical_url; reruns create nothing.
 - Tests use fixture feeds, never the live network.

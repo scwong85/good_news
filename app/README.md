@@ -1,11 +1,19 @@
-# App (Flutter: Android + Web)
+# App (Flutter, Android first)
 
-Single Flutter codebase for the Android app and the web app. Web is deployed to GitHub Pages; the API is hosted separately (see `../docs/deployment.md`).
+The shipped product. It fetches the curated feeds on the device when opened and does all processing locally. Architecture: [`../docs/architecture.md`](../docs/architecture.md). Plan: [`../docs/implementation-plan.md`](../docs/implementation-plan.md).
 
-Not yet implemented. Phase 4 creates the project (`flutter create --platforms=android,web,ios .`) and builds Today, Explore, Story detail, Saved and Preferences.
+**Not yet created.** Phase 3 runs `flutter create --platforms=android .` here (code stays web-compatible; the web build is a future milestone) and adds:
 
-Web build for a GitHub project site:
 ```
-flutter build web --release --base-href /good_news/ --dart-define=API_BASE_URL=https://<api-host>/api/v1
+lib/
+  domain/        models
+  data/sources/  StorySource, DirectRssStorySource (StaticJsonStorySource later)
+  data/db/       Drift tables and migrations
+  pipeline/      normalize, canonicalize, filters, dedupe, classify, rank, select (pure Dart)
+  rules/         rules.json loader
+  features/      today, explore, story, saved, preferences
+  core/          http, clock, config
+assets/rules/    bundled copy of ../rules/rules.json (scripts/sync-rules.sh)
+test/fixtures/   fixture feeds and golden classification cases
 ```
-Use hash URL strategy (Pages has no SPA fallback). Details: `../.claude/skills/flutter-web/SKILL.md`.
+Checks: `flutter analyze && flutter test`. Never commit signing keys.

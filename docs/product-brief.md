@@ -1,24 +1,25 @@
 # Product Brief
 
-**Good News Aggregator**: a calm, trustworthy, mobile-first app that aggregates credible *constructive* news from vetted sources.
+**Good News Aggregator**: a calm, trustworthy Android app (web later) that gives you a small daily briefing of credible *constructive* news from vetted sources.
 
-**Promise:** a daily briefing on credible progress, solutions and constructive developments. It is not an algorithmic positivity filter, and it never labels all global news as good or bad.
+**Promise:** 5 to 10 stories a day (your setting) about credible progress, solutions and constructive developments. It is not an algorithmic positivity filter, and it never labels all global news as good or bad.
 
 ## Principles
-1. Curated allowlist first; no broad crawling at launch.
-2. Trust and calm reading over engagement.
-3. Deterministic rules + optional local models; external LLMs only enrich, never publish.
-4. Never republish full articles: headline, short excerpt/summary, attribution, canonical link.
-5. Anonymous reading, minimal data, no account needed.
-6. Editorial decisions and user feedback are training data.
+1. Curated source allowlist only; no broad crawling.
+2. **Client-side first:** the app fetches feeds itself when opened. No server, account or background sync is required.
+3. Trust and calm over engagement: no infinite scroll, no streaks, no nags.
+4. Transparent rule-based classification; every story shows why it was included. No LLM dependency.
+5. Never republish full articles: headline, short excerpt, source, and a link to the original.
+6. Private by default: no accounts, analytics or ads. Data stays on the device.
+
+## How it works
+Open the app -> cached picks appear immediately -> feeds refresh in the background of that session -> new items are filtered, classified and de-duplicated on the device -> today's picks (5-10) are fixed for the day.
 
 ## Delivery path
-One Flutter codebase builds the Android app and the web app. Web is hosted on GitHub Pages (static); the Django API is hosted separately. iOS can be added later from the same codebase.
+Android first. Web comes later as a future milestone, reading a pre-built static JSON file (browsers block direct feed requests). See `implementation-plan.md` and `architecture.md`.
 
-## Screens (Phase 4/5, Flutter)
-Today (5-10 stories), Explore (topic/region/type filters + search), Story detail, Saved, Preferences, Daily digest.
+## Screens
+Today, Explore (topic/region/type filters and search over cached stories), Story detail, Saved (offline), Preferences (stories per day 5-10, topics, regions, sources, sensitivity).
 
-## Success metrics
-Content quality (useful rate, evidence-signal rate, duplicate rate, editor override rate, flag rate); engagement (DAU, D7/D30 return, digest open, save rate); operations (ingestion success, latency, queue backlog, uptime).
-
-Full plan: see the original implementation plan; phase tracking is in `decision-log.md`.
+## Success metrics (no telemetry; measured via manual studies and store feedback)
+Useful rate of sampled stories, duplicate rate, rules precision on the labeled set, cached-launch time, fetch success rate in test runs, crash-free rate from the store.

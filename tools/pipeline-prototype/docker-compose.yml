@@ -1,0 +1,17 @@
+# Postgres for the Python reference pipeline and its tests. Redis/Celery are optional
+# (the `ingest` command runs without them).
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: goodnews
+      POSTGRES_USER: goodnews
+      POSTGRES_PASSWORD: goodnews
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U goodnews"]
+      interval: 5s
+      retries: 10
+volumes:
+  pgdata:

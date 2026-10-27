@@ -1,24 +1,27 @@
 # Good News Aggregator: project guide
 
-Calm, trustworthy aggregator of credible *constructive* news. Read `docs/product-brief.md` first.
+Calm, trustworthy app that gives a small daily briefing (5-10 stories, user setting) of credible *constructive* news. Read `docs/product-brief.md`, then `docs/architecture.md` and `docs/implementation-plan.md`.
+
+## Architecture in one paragraph
+**Client-side first.** A Flutter app (Android first, in `app/`) fetches the curated RSS feeds itself when opened, then parses, filters, classifies (rules in `rules/rules.json`), de-duplicates and selects the day's picks on the device, stored in SQLite. There is no server we operate and no background fetching. The **web app is a future milestone** that reads pre-built static JSON (browsers block direct feed reads). `tools/pipeline-prototype/` is the Python/Django reference pipeline (Phase 1, done): used for rules evaluation and the future web export, not deployed.
 
 ## Shared context (keep these current)
-`docs/`: product-brief, editorial-policy, source-allowlist.csv, api-contracts, data-model, classification-rules, pipeline-hooks, decision-log, test-plan, deployment.
+`docs/`: product-brief, architecture, implementation-plan, editorial-policy, source-allowlist.csv, classification-rules, data-model (on-device), static-feed-contract (future), pipeline-hooks, test-plan, deployment, decision-log. Data: `data/seed_labels.jsonl` (draft labels, human review pending). Rules: `rules/`.
 
 ## Non-negotiables
-- Curated allowlist only; Tier 3 / broad discovery never auto-publishes.
-- No external LLM dependency; LLM output is a draft, never auto-published.
-- Never republish full articles; headline + short excerpt/summary + attribution + canonical link.
-- Every classification has a stored explanation. Reviewer can override anything.
-- Ingestion must be idempotent (no duplicate canonical URLs on rerun).
-- Anonymous reading; minimal user data.
+- Curated allowlist only. No broad discovery, no Tier 3.
+- Never republish full articles: headline + feed excerpt (<= 300 chars) + source + link to the original. Never fetch article pages.
+- Every classification has an explanation; rules are deterministic and versioned; change them only with an evaluation on the labeled set.
+- Classifier parity: the Python reference and the Dart port must agree on the labeled set.
+- Fetch-on-open only; no background sync. Be a polite client: User-Agent, cache TTL 30 min, conditional GET, honor 429/Retry-After.
+- Privacy: no accounts, analytics or ads; data stays on the device; telemetry only if opt-in.
+- No LLM dependency.
+- Do not build or host the web app, and do not add servers, until the owner starts that milestone.
 - Don't add CI workflows until the owner asks.
 
-## Stack
-Python 3.12 + uv, Django 5 + DRF, Celery + Redis, PostgreSQL 16, Flutter (one codebase: Android app + web app on GitHub Pages) in `app/`. Django API hosted on Fly.io for MVP (GitHub Pages is static-only).
-
 ## Workflow
-- Follow phase order in `docs/decision-log.md`; update the tracker and log decisions/open questions there.
-- Skills in `.claude/skills/` cover each area. A Stop hook runs `scripts/dev-check.sh` (lint/tests once code exists).
-- Dev commands: `docker compose up -d db redis`; backend `cd backend && uv run pytest`; app `cd app && flutter test`.
+- Follow the phase order in `docs/implementation-plan.md`; update the tracker, decisions and open questions in `docs/decision-log.md`.
+- Skills in `.claude/skills/` cover each area (`flutter-app`, `rss-ingestion`, `rule-based-classification`, `deduplication`, `privacy-and-content-licensing`, `evaluation-and-test-writing`, `pipeline-prototype`; `static-feed-export`, `local-embeddings`, `llm-enrichment` are future).
+- A Stop hook runs `scripts/dev-check.sh` (rules sync check, `flutter analyze/test` once `app/` exists; set `DEV_CHECK_PROTOTYPE=1` to include the Python prototype, which needs Postgres).
+- Commands: app `cd app && flutter test`; prototype `cd tools/pipeline-prototype && uv run pytest`; rules sync `scripts/sync-rules.sh`.
 - Tests never hit the live network; use fixture feeds.

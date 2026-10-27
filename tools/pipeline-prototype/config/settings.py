@@ -4,7 +4,7 @@ from pathlib import Path
 import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-REPO_ROOT = BASE_DIR.parent
+REPO_ROOT = BASE_DIR.parents[1]  # tools/pipeline-prototype -> repo root
 
 
 def env_bool(name: str, default: bool = False) -> bool:
