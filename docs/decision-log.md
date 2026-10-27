@@ -18,9 +18,9 @@
 | 13 | Web app hosted on GitHub Pages (static); Django API hosted separately on Fly.io with CORS; hash routing + base-href | 2026-10-27 |
 
 ## Open questions / blockers
-- **Sources:** feeds checked 2026-10-27: 10 of 11 return valid RSS. Squirrel News feed 404s (inactive until a working feed is found), so only 9 sources are active; the plan asks for >= 10. Candidates to add: more Tier 1/2 sources.
+- **Sources:** feeds checked 2026-10-27: 10 of 11 return valid RSS. Squirrel News feed 404s and stays inactive until a working feed is found. 10 sources are active, which meets the Phase 0 criterion of >= 10.
 - **Labels:** `data/seed_labels.jsonl` has 102 draft labels from Claude; need human review. Upworthy (2/10) and YES! Magazine (0/8) yielded few constructive items, so consider lowering their trust or disabling them.
-- robots.txt allows the feed paths of all 9 active sources; per-source terms/licensing review is still pending.
+- robots.txt allows the feed paths of the 9 sites checked (Good Good Good's and Squirrel News's robots.txt were not checked); per-source terms/licensing review is still pending.
 - Licensing/terms review per source not done.
 - Contact address for takedown requests.
 - Project name/domain.
@@ -28,7 +28,7 @@
 ## Phase tracker
 | Phase | Status |
 |---|---|
-| 0 Editorial foundation | Mostly done: policy, rules, schema, 9 verified feeds, 102 draft labels. Remaining: 10th source, human label review, licensing review |
+| 0 Editorial foundation | Mostly done: policy, rules, schema, 10 verified feeds, 102 draft labels. Remaining: human label review, licensing review |
 | 1 Ingestion MVP | Not started |
 | 2 Deterministic classification | Not started |
 | 3 Deduplication | Not started |
