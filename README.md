@@ -4,7 +4,7 @@ A calm, mobile-first Flutter app (Android + web) that aggregates credible constr
 
 - Product and editorial docs: [`docs/`](docs/)
 - Contributor/agent guide: [`CLAUDE.md`](CLAUDE.md)
-- Status: Phase 0 (editorial foundation). See [`docs/decision-log.md`](docs/decision-log.md).
+- Status: Phase 1 (ingestion MVP) done; Phase 2 (classification) next. Backend quick start: [`backend/README.md`](backend/README.md). See [`docs/decision-log.md`](docs/decision-log.md).
 
 ## Layout
 ```

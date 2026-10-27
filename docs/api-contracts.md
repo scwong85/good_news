@@ -27,6 +27,9 @@ Base path `/api/v1`. JSON. Public read endpoints need no auth. Reader state is k
 ```
 Never returns full article text.
 
+## Implemented in Phase 1
+`GET /health`, `GET /articles` (published only; `topic` filter; cursor pagination), `GET /articles/{id}`. Other endpoints arrive in Phases 4-5. The server-rendered feed is at `/`.
+
 ## Staff (Django admin, Phase 1/2 initially; REST later)
 Review queue, approve/reject/edit/archive, source management, classification explanation, duplicate clusters, labeled-data export.
 

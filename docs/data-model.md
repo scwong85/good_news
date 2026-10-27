@@ -1,12 +1,12 @@
 # Data Model
 
-PostgreSQL 16. All primary keys are UUIDs. Timestamps are timezone-aware UTC. The raw payload and normalized article are stored separately.
+PostgreSQL 16. All primary keys are UUIDs. List fields are stored as JSON arrays (JSONField) in Phase 1. Timestamps are timezone-aware UTC. The raw payload and normalized article are stored separately.
 
 ## Source
-`id, name, homepage_url, rss_url, tier (1-3), trust_score (0-1), language, regions[], active, last_fetched_at, fetch_interval_minutes, robots_policy ('respect'), licensing_notes, include_rules, exclude_rules, reviewed_count, created_at, updated_at`
+`id, name, homepage_url, rss_url, tier (1-3), trust_score (0-1), language, regions[], active, last_fetched_at, etag, last_modified, fetch_interval_minutes, robots_policy ('respect'), licensing_notes, reviewed_count, created_at, updated_at` (`include_rules`/`exclude_rules` arrive in Phase 2)
 
 ## IngestionRun
-`id, source_id, started_at, finished_at, status (success|partial|failed), http_status, items_seen, items_created, items_skipped, error_message`
+`id, source_id, requested_url, started_at, finished_at, status (running|success|partial|failed|skipped), http_status, items_seen, items_created, items_skipped, items_failed, error_message`
 One row per fetch attempt; records success/failure per source.
 
 ## RawItem
@@ -14,7 +14,7 @@ One row per fetch attempt; records success/failure per source.
 Unique `(source_id, external_id)`. Immutable.
 
 ## Article
-`id, source_id, raw_item_id, external_id, canonical_url (unique), title, excerpt, published_at, language, regions[], topics[], story_types[], summary, why_it_matters, evidence_signals[], quality_score, constructive_score, classification_explanation (jsonb), duplicate_of_id, cluster_id, status, review_decision, reviewed_by, embedding (optional, vector/array), search_vector, created_at, updated_at`
+`id, source_id, raw_item_id, external_id, canonical_url (unique), title, excerpt, published_at, language, regions[], topics[], story_types[], summary, why_it_matters, evidence_signals[], quality_score, constructive_score, classification_explanation (jsonb), duplicate_of_id, cluster_id, status, review_decision, reviewed_by, rejection_reason, embedding (Phase 3), search_vector (Phase 4), created_at, updated_at`
 
 ### Status machine
 `discovered -> filtered_out | pending_review | approved`

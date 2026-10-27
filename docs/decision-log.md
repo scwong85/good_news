@@ -15,6 +15,10 @@
 | 10 | MVP hosting target: Fly.io (AWS ECS later) | 2026-10-27 |
 | 11 | Hooks split: pipeline hooks in app code; Claude Code hooks only for dev workflow | 2026-10-27 |
 | 12 | No CI workflow yet (explicit request) | 2026-10-27 |
+| 14 | Phase 1: list-valued fields (`regions`, `topics`, `story_types`, `evidence_signals`) are JSONField, not ArrayField; revisit with GIN indexes in Phase 4 | 2026-10-27 |
+| 15 | Phase 1: do not fetch article pages (no `rel=canonical` resolution, no HTML extraction); excerpt comes from the RSS description only, which is also the safest licensing posture | 2026-10-27 |
+| 16 | Canonical URLs upgrade `http` to `https`, drop fragments and tracking params, and strip trailing slashes | 2026-10-27 |
+| 17 | Until Phase 2, every ingested article is `pending_review` (or `filtered_out` if older than 14 days); nothing is auto-published | 2026-10-27 |
 | 13 | Web app hosted on GitHub Pages (static); Django API hosted separately on Fly.io with CORS; hash routing + base-href | 2026-10-27 |
 
 ## Open questions / blockers
@@ -29,7 +33,7 @@
 | Phase | Status |
 |---|---|
 | 0 Editorial foundation | Mostly done: policy, rules, schema, 10 verified feeds, 102 draft labels. Remaining: human label review, licensing review |
-| 1 Ingestion MVP | Not started |
+| 1 Ingestion MVP | Done: models, RSS ingestion, admin review queue, simple feed, 66 tests. Live backfill created 1,418 articles; rerun created 0 |
 | 2 Deterministic classification | Not started |
 | 3 Deduplication | Not started |
 | 4 Flutter app MVP (Android + web) | Not started |

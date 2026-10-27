@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Good News</title>
+  <style>
+    :root { --bg:#faf8f4; --fg:#26302b; --muted:#667068; --accent:#2f6b4f; --card:#fff; --line:#e6e1d8; }
+    @media (prefers-color-scheme: dark) { :root { --bg:#161a17; --fg:#e8ece9; --muted:#9aa59d; --accent:#7cc4a0; --card:#1e2420; --line:#2c342f; } }
+    body { margin:0; background:var(--bg); color:var(--fg); font:17px/1.55 Georgia, serif; }
+    main { max-width:42rem; margin:0 auto; padding:1.5rem 1rem 4rem; }
+    h1 { font-size:1.6rem; margin:0 0 .25rem; } .lede { color:var(--muted); margin:0 0 1.5rem; font:.95rem system-ui, sans-serif; }
+    article { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:1rem 1.1rem; margin:0 0 1rem; }
+    article h2 { font-size:1.15rem; margin:.1rem 0 .4rem; } a { color:var(--accent); }
+    .meta { color:var(--muted); font:.8rem system-ui, sans-serif; display:flex; flex-wrap:wrap; gap:.25rem .75rem; }
+    p { margin:.4rem 0 .6rem; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Good News</h1>
+  <p class="lede">Credible, constructive stories, reviewed by people. Each links to its original publisher.</p>
+  {% for a in articles %}
+    <article>
+      <div class="meta">
+        <span>{{ a.source.name }}</span>
+        <time datetime="{{ a.published_at|date:'c' }}">{{ a.published_at|date:"j M Y" }}</time>
+        <span>{% if a.topics %}{{ a.topics|join:", " }}{% else %}Uncategorized{% endif %}</span>
+      </div>
+      <h2><a href="{{ a.canonical_url }}" rel="noopener noreferrer">{{ a.title }}</a></h2>
+      {% if a.summary %}<p>{{ a.summary }}</p>{% elif a.excerpt %}<p>{{ a.excerpt }}</p>{% endif %}
+      {% if a.why_it_matters %}<p><em>Why it matters:</em> {{ a.why_it_matters }}</p>{% endif %}
+      <a class="meta" href="{{ a.canonical_url }}" rel="noopener noreferrer">Read at {{ a.source.name }} →</a>
+    </article>
+  {% empty %}
+    <p>No stories have been published yet.</p>
+  {% endfor %}
+</main>
+</body>
+</html>
