@@ -38,6 +38,12 @@ Status: **active**, or **superseded by #n**.
 | 36 | Regex semantics are ASCII in both implementations (Python `re.ASCII`; whitespace collapsed first). Found by golden edge cases; no change to the 290 labeled results, so no rules-version bump | 2026-10-27 | active |
 | 37 | Ranking weights (0.25 trust, 0.25 freshness, 0.40 constructive, 0.10 topic boost, 0.30 seen penalty) and the four-pass selector (today, explore, relax topic cap, relax source cap). Preferred topics boost rather than filter. Previous days' picks never repeat. Picks are append-only per local day | 2026-10-27 | active |
 | 38 | On-device DB schema v2 adds `daily_picks`, `seen`, `preferences` with a tested v1 -> v2 migration (drift schema tooling in `app/drift_schemas`) | 2026-10-27 | active |
+| 39 | UI: go_router with a bottom bar on phones and a navigation rail from 720 dp; Riverpod `Notifier`s; story titles in a serif, light/dark Material 3 theme; no infinite scroll, a calm end-of-day state | 2026-10-27 | active |
+| 40 | Today is cache-first: show today's already-created picks immediately, refresh, then create/extend picks. With no picks yet today the screen waits (up to the 15 s deadline) so today's news can be in the picks. A manual refresh bypasses the 30 min cache at most once per 2 minutes | 2026-10-27 | active |
+| 41 | `DailyPicksService.todaysPicks()` is serialized and `appendPicks` ignores stories already picked that day (a race found by UI tests: a fast slider drag produced 11 picks from 8 articles). The settings slider saves only when released | 2026-10-27 | active |
+| 42 | Bookmarks (schema v3) store a snapshot (headline, short excerpt, source, link, date, classification) with no foreign key, so saved stories survive cleanup of old articles and open offline. `markSeen` ignores ids with no article | 2026-10-27 | active |
+| 43 | Each story explains itself ("Why this story was included") in plain language from the stored rule matches, with an honest footnote that no person checked it | 2026-10-27 | active |
+| 44 | Content sensitivity and digest-time preferences are deferred (undefined behaviour; digest needs the Phase 6 local reminder) | 2026-10-27 | active |
 | 25 | State management Riverpod, storage Drift/SQLite, routing go_router | 2026-10-27 | active for Riverpod 3 (DI only so far) and Drift; go_router still proposed (Phase 5) |
 | 31 | Dart port differences from the Python reference: no language detection (items use the source's language), no Unicode NFC normalization, own XML sanitizer (bare `&`, HTML named entities, control chars, BOM, ISO-8859-1) because the `xml` package is strict. URL canonicalization is checked against the Python output (`app/test/fixtures/golden_urls.json`, 41 cases) | 2026-10-27 | active |
 | 32 | Phase 3 libraries: `http`, `xml`, `html`, `crypto`, `drift` + `drift_flutter`, `flutter_riverpod`. Drift row classes are `SourceRow`/`ArticleRow`; generated code is committed; Drift returns local-time `DateTime`s, so compare instants/UTC | 2026-10-27 | active |
@@ -63,7 +69,7 @@ Status: **active**, or **superseded by #n**.
 | 2 Shared classification rules | Done (revised targets met): rules 2026.11.2, Python reference, evaluator, golden cases, 93 tests, evaluation report |
 | 3 Flutter app foundation (Android) | Done in code: models, fetcher, parser, normalizer, Drift DB, ingestion service, harness screen, 113 tests, live-feed check. **Not yet built or run on a device/emulator** |
 | 4 On-device classification, de-dup, daily selection | Done in code: Dart classifier (306/306 golden cases), title de-duplication, ranker, selector, picks service, DB v2 + migration, 226 tests, live-feed check. Acceptance (3) partly met (see plan). **Not yet run on a device** |
-| 5 Android UI | Not started |
+| 5 Android UI | Done in code: Today, Explore, Story, Saved, Settings and About screens; 319 Flutter tests (accessibility, responsive, reader journey); integration test written. **Not yet run on a device** |
 | 6 Android hardening and release | Not started |
 | Future A: Web via static JSON | Future |
 | Future B: Remote rules and editorial loop | Future |

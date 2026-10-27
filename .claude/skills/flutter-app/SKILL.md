@@ -12,4 +12,7 @@ description: Flutter app for Good News (Android first): architecture, layers, UI
 - Daily picks: `stories_per_day` 5-10 (default 5), fixed for the local day, caps of 2 per source / 3 per topic.
 - UI: calm, no infinite scroll or engagement nags; TalkBack labels, 200% text scale, contrast. Every story shows source, date, topic, 'why included' and links to the original publisher. Never show more than the stored excerpt.
 - No backend, accounts, analytics or ads. Preferences, bookmarks and feedback stay on device.
+- UI structure: `lib/app` (theme, go_router, providers), `lib/features/*` (today, explore, story, saved, settings), `lib/data/story_repository.dart`. Use the shared widgets (`StoryCard`, `EmptyState`, `ScrollableCenter`, `StatusBanner`) so states and accessibility stay consistent. Every list/empty state must scroll at 200% text on a 320 px screen.
+- Today is cache-first (`TodayController`); create/extend picks only after a refresh; `todaysPicks()` is serialized.
+- Test with `test/support/app_harness.dart` (in-memory DB, fake web, fake link/share). Use `ensureVisible` + a short pump before tapping off-screen widgets; load assets with `cache: false` for one-off reads.
 - Checks: `flutter analyze && flutter test`. Never commit signing keys. Do not add CI until asked.

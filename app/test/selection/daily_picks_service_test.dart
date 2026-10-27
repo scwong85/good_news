@@ -174,6 +174,49 @@ void main() {
     expect(ids.where((id) => id == a || id == b), hasLength(1));
   });
 
+  test('overlapping calls never over-fill or duplicate the day (race regression)', () async {
+    await boot();
+    await seed(15);
+    await prefs.setStoriesPerDay(7);
+    final results = await Future.wait([for (var i = 0; i < 8; i++) service.todaysPicks()]);
+    final stored = await db.picksForDay(DailyPicksService.dayKey(clock.value));
+    expect(stored, hasLength(7));
+    expect(stored.map((p) => p.articleId).toSet(), hasLength(7));
+    for (final r in results) {
+      expect(r.map((a) => a.id).toSet(), hasLength(r.length));
+      expect(r, hasLength(7));
+    }
+  });
+
+  test('stepping stories per day up quickly, with overlapping calls, ends at the final quota', () async {
+    await boot();
+    await seed(15);
+    final calls = <Future<Object?>>[];
+    for (final n in [6, 7, 8, 9, 10]) {
+      await prefs.setStoriesPerDay(n);
+      calls.add(service.todaysPicks());
+    }
+    await Future.wait(calls);
+    final stored = await db.picksForDay(DailyPicksService.dayKey(clock.value));
+    expect(stored, hasLength(10));
+    expect(stored.map((p) => p.articleId).toSet(), hasLength(10));
+  });
+
+  test('appendPicks ignores stories already picked that day', () async {
+    await boot();
+    final ids = await seed(3);
+    await db.appendPicks('2026-10-27', [ids[0], ids[1]]);
+    await db.appendPicks('2026-10-27', [ids[1], ids[2], ids[0]]);
+    expect((await db.picksForDay('2026-10-27')).map((p) => p.articleId), ids);
+  });
+
+  test('marking an unknown story as seen is ignored (saved stories outlive their articles)', () async {
+    await boot();
+    final ids = await seed(2);
+    await service.markSeen([ids[0], 'no-such-article']);
+    expect(await db.seenIds(), {ids[0]});
+  });
+
   test('works with nothing to pick', () async {
     await boot();
     expect(await service.todaysPicks(), isEmpty);

@@ -101,3 +101,17 @@ class PreferenceEntries extends Table {
   @override
   Set<Column> get primaryKey => {key};
 }
+
+/// Saved stories. Deliberately no foreign key to `articles`: the snapshot (title, excerpt, source,
+/// link, date) keeps the story readable offline after the article itself has been pruned.
+@DataClassName('BookmarkRow')
+class Bookmarks extends Table {
+  TextColumn get articleId => text()();
+  DateTimeColumn get savedAt => dateTime()();
+
+  /// JSON object, see `StorySnapshot`.
+  TextColumn get snapshot => text()();
+
+  @override
+  Set<Column> get primaryKey => {articleId};
+}

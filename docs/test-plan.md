@@ -20,6 +20,9 @@ Fetch-on-open with mocked HTTP: parallel fetch, per-source isolation, timeouts, 
 ## UI
 Widget tests for Today, Explore, Story, Saved, Preferences (empty/loading/error/offline states). Accessibility checks: TalkBack labels, 200% text scale, contrast. Integration test for first launch -> picks -> open story -> save -> offline reopen.
 
+## UI (Phase 5)
+Widget tests drive the whole app on in-memory SQLite and a fake web (`test/support/app_harness.dart`): Today (first open, gathering, cache-first, offline, partial failure, deadline, refresh politeness, stories per day), Explore (search, filters, de-duplication), Story (why included, open original, share, save, seen), Saved (offline, survives cleanup), Settings and About. Accessibility: tap-target, label and contrast guidelines in light and dark, semantics of cards, slider and refresh button. Responsive: phone vs tablet navigation, readable column width, no overflow at 100% to 200% text on 320 to 1000 px. `test/app_flow_test.dart` runs the reader journey; `integration_test/app_test.dart` runs the same journey on a device. `SCREENSHOT_DIR=<dir> flutter test test/screenshots` renders the screens to PNG for visual review.
+
 ## Safety
 - The app never displays more than the stored excerpt and never fetches article pages.
 - Every story links to the original publisher.

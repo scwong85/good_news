@@ -14,12 +14,12 @@ part 'app_database.g.dart';
 String articleIdFor(String canonicalUrl) =>
     sha1.convert(utf8.encode(canonicalUrl)).toString().substring(0, 16);
 
-@DriftDatabase(tables: [Sources, Articles, DailyPicks, Seen, PreferenceEntries])
+@DriftDatabase(tables: [Sources, Articles, DailyPicks, Seen, PreferenceEntries, Bookmarks])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -30,6 +30,10 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(dailyPicks);
             await m.createTable(seen);
             await m.createTable(preferenceEntries);
+          }
+          if (from < 3) {
+            // v3 (Phase 5): saved stories.
+            await m.createTable(bookmarks);
           }
         },
         beforeOpen: (details) async {
@@ -234,7 +238,9 @@ class AppDatabase extends _$AppDatabase {
     await transaction(() async {
       final existing = await picksForDay(day);
       var position = existing.isEmpty ? 0 : existing.last.position + 1;
+      final already = existing.map((p) => p.articleId).toSet();
       for (final id in articleIds) {
+        if (!already.add(id)) continue; // a story is never picked twice on one day
         await into(dailyPicks).insert(
           DailyPicksCompanion.insert(day: day, position: position++, articleId: id),
           mode: InsertMode.insertOrIgnore,
@@ -251,11 +257,21 @@ class AppDatabase extends _$AppDatabase {
     return [for (final id in ids) if (byId[id] != null) byId[id]!];
   }
 
+  /// Records stories as seen. Ids without an article row (for example a saved story whose
+  /// article has been cleaned up) are ignored: there is nothing to pick again.
   Future<void> markSeen(Iterable<String> articleIds, DateTime at) async {
+    final ids = articleIds.toSet().toList();
+    if (ids.isEmpty) return;
+    final existing = (await (selectOnly(articles)
+              ..addColumns([articles.id])
+              ..where(articles.id.isIn(ids)))
+            .get())
+        .map((r) => r.read(articles.id)!)
+        .toSet();
     await batch((b) {
       b.insertAll(
         seen,
-        [for (final id in articleIds) SeenCompanion.insert(articleId: id, seenAt: at)],
+        [for (final id in ids) if (existing.contains(id)) SeenCompanion.insert(articleId: id, seenAt: at)],
         mode: InsertMode.insertOrIgnore,
       );
     });
@@ -264,16 +280,40 @@ class AppDatabase extends _$AppDatabase {
   Future<Set<String>> seenIds() async =>
       (await select(seen).get()).map((r) => r.articleId).toSet();
 
+  // --- single rows, bookmarks ---------------------------------------------------------------
+
+  Future<(ArticleRow, SourceRow)?> articleWithSource(String id) async {
+    final query = select(articles).join([innerJoin(sources, sources.id.equalsExp(articles.sourceId))])
+      ..where(articles.id.equals(id));
+    final row = await query.getSingleOrNull();
+    return row == null ? null : (row.readTable(articles), row.readTable(sources));
+  }
+
+  Future<void> addBookmark(String articleId, String snapshotJson, DateTime at) => into(bookmarks)
+      .insertOnConflictUpdate(BookmarksCompanion.insert(articleId: articleId, savedAt: at, snapshot: snapshotJson));
+
+  Future<void> removeBookmark(String articleId) =>
+      (delete(bookmarks)..where((t) => t.articleId.equals(articleId))).go();
+
+  /// Newest saved first.
+  Future<List<BookmarkRow>> allBookmarks() =>
+      (select(bookmarks)..orderBy([(t) => OrderingTerm.desc(t.savedAt), (t) => OrderingTerm.asc(t.articleId)])).get();
+
+  Future<Set<String>> bookmarkedIds() async =>
+      (await select(bookmarks).get()).map((r) => r.articleId).toSet();
+
   Future<String?> getPreference(String key) async =>
       (await (select(preferenceEntries)..where((t) => t.key.equals(key))).getSingleOrNull())?.value;
 
   Future<void> setPreference(String key, String value) => into(preferenceEntries)
       .insertOnConflictUpdate(PreferenceEntriesCompanion.insert(key: key, value: value));
 
-  /// Deletes articles published before [cutoff]. (Bookmarked articles will be excluded
-  /// once the bookmarks table exists in Phase 5.)
-  Future<int> pruneArticles(DateTime cutoff) =>
-      (delete(articles)..where((t) => t.publishedAt.isSmallerThanValue(cutoff))).go();
+  /// Deletes articles published before [cutoff], except bookmarked ones.
+  Future<int> pruneArticles(DateTime cutoff) => (delete(articles)
+        ..where((t) =>
+            t.publishedAt.isSmallerThanValue(cutoff) &
+            t.id.isNotInQuery(selectOnly(bookmarks)..addColumns([bookmarks.articleId]))))
+      .go();
 }
 
 Iterable<List<T>> _chunks<T>(List<T> list, int size) sync* {

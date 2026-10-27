@@ -35,7 +35,9 @@ final storySourceProvider = Provider<StorySource>(
 
 /// The bundled classification rules (assets/rules/rules.json, synced from /rules).
 final rulesProvider = FutureProvider<Rules>(
-  (ref) async => Rules.parse(await rootBundle.loadString('assets/rules/rules.json')),
+  // cache: false: the file is read once per app run, and a cached future would be shared across
+  // app instances (tests).
+  (ref) async => Rules.parse(await rootBundle.loadString('assets/rules/rules.json', cache: false)),
 );
 
 final classificationServiceProvider = FutureProvider<ClassificationService>(
@@ -71,4 +73,4 @@ Future<List<Source>> loadBundledSources(Future<String> Function(String) load) as
 }
 
 final bundledSourcesProvider =
-    FutureProvider<List<Source>>((ref) => loadBundledSources(rootBundle.loadString));
+    FutureProvider<List<Source>>((ref) => loadBundledSources((p) => rootBundle.loadString(p, cache: false)));

@@ -27,8 +27,30 @@ class DailyPicksService {
     return '${l.year}-${two(l.month)}-${two(l.day)}';
   }
 
+  /// Today's already-created picks (limited to stories_per_day) without creating or extending
+  /// anything. Used to show the cache instantly on launch; the day's picks are created only after
+  /// the fresh fetch, so that today's news can be part of them.
+  Future<List<ArticleRow>> existingPicks() async {
+    final prefs = await preferences.load();
+    final picks = await db.picksForDay(dayKey(_now()));
+    return db.articlesByIds(picks.take(prefs.storiesPerDay).map((p) => p.articleId).toList());
+  }
+
+  Future<void> _queue = Future.value();
+
+  /// Runs [task] after all earlier tasks finished, so that picks are never created from stale
+  /// data by two overlapping calls (a fast slider drag or a refresh racing a settings change).
+  Future<T> _serialized<T>(Future<T> Function() task) {
+    final run = _queue.then((_) => task());
+    _queue = run.then<void>((_) {}, onError: (_) {});
+    return run;
+  }
+
   /// Today's picks, creating or extending them if needed, limited to stories_per_day.
-  Future<List<ArticleRow>> todaysPicks() async {
+  /// Calls are serialized and idempotent.
+  Future<List<ArticleRow>> todaysPicks() => _serialized(_todaysPicks);
+
+  Future<List<ArticleRow>> _todaysPicks() async {
     final now = _now().toUtc();
     final day = dayKey(_now());
     final prefs = await preferences.load();
