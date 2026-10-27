@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import '../data/db/app_database.dart';
 import '../data/http/feed_fetcher.dart';
+import '../classification/classification_service.dart';
 import '../data/sources/story_source.dart';
 import '../domain/source.dart' as domain;
 import '../pipeline/feed_parser.dart';
@@ -47,6 +48,8 @@ class IngestionService {
     this.concurrency = 4,
     this.deadline = const Duration(seconds: 15),
     this.retentionDays = 30,
+    this.classification,
+    this.afterRefresh = const [],
   }) : _now = now ?? DateTime.now;
 
   final AppDatabase db;
@@ -56,6 +59,13 @@ class IngestionService {
   final int concurrency;
   final Duration deadline;
   final int retentionDays;
+
+  /// When set, new articles are classified on insert (`after_classify`).
+  final ClassificationService? classification;
+
+  /// Run in order after all sources finished (re-classification after a rules update,
+  /// duplicate clustering, ...). A failing hook never fails the refresh.
+  final List<Future<Object?> Function()> afterRefresh;
 
   /// Refreshes every enabled source. [force] ignores the cache TTL, backoff and ETags.
   Future<IngestionReport> refresh({bool force = false}) async {
@@ -94,6 +104,13 @@ class IngestionService {
     }
 
     await db.pruneArticles(startedAt.subtract(Duration(days: retentionDays)));
+    for (final hook in afterRefresh) {
+      try {
+        await hook();
+      } catch (_) {
+        // Hooks are best-effort; the refresh result stands.
+      }
+    }
     return IngestionReport(
       sources.map((s) => outcomes[s.id]!).toList(),
       startedAt,
@@ -130,7 +147,11 @@ class IngestionService {
       final now = _now().toUtc();
       final cutoff = now.subtract(Duration(days: retentionDays));
       final fresh = result.candidates.map((c) => c.item).where((i) => !i.publishedAt.isBefore(cutoff)).toList();
-      final added = await db.insertNewArticles(source.id, fresh, now);
+      final classifications = {
+        if (classification != null)
+          for (final item in fresh) item.canonicalUrl: classification!.classifyNew(item, row),
+      };
+      final added = await db.insertNewArticles(source.id, fresh, now, classifications: classifications);
       await db.recordFetchSuccess(
         source.id,
         at: now,

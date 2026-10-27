@@ -28,8 +28,9 @@ Tested 2026-10-27: 1 of 10 active feeds sends CORS headers (Mongabay). The other
 | `domain/` | Plain models: `Source`, `Article`, `Classification`, `Preferences`, `DailyPick` |
 | `data/sources/` | `StorySource` interface; `DirectRssStorySource` (Android), `StaticJsonStorySource` (web, future) |
 | `data/db/` | Drift/SQLite tables, DAOs, migrations |
-| `pipeline/` | Pure Dart: `normalize`, `canonicalize_url`, `filters`, `dedupe`, `classify`, `rank`, `select` (no Flutter imports, fully unit-testable) |
-| `rules/` | Loads `rules.json` (bundled asset; remote updates are a future milestone) |
+| `pipeline/` | Pure Dart, no Flutter imports, fully unit-testable: `canonicalize_url`, `dates`, `feed_parser`, `normalize`, `rules` (loads `rules.json`), `classifier`, `dedupe` |
+| `classification/` | `ClassificationService`: classifies on insert; re-classifies stored articles after a rules update |
+| `selection/` | Pure `rank` and `daily_selector`; `DedupeService` (cluster ids), `PreferencesRepository`, `DailyPicksService` |
 | `features/` | `today`, `explore`, `story`, `saved`, `preferences` (UI + state) |
 | `core/` | Riverpod providers, asset loading, clock, config |
 | `ingestion/` | `IngestionService` (parallel refresh, TTL, backoff, retention) |
@@ -54,10 +55,15 @@ Overall deadline for a refresh: 15 s. Honor `429`/`Retry-After`: back off that s
 
 ## Daily selection (5 to 10 stories, user setting)
 - "Day" is the device's local calendar day. `stories_per_day` is an integer 5-10 (default 5).
-- Candidates: `route = today` first, then `route = explore` with the highest scores (floor 0.42) to fill the quota when `today` has too few stories (measured supply is about 2.6 `today` and 5.9 `explore` per day). Excluded items are never candidates. All candidates must be unhidden, unseen, within the age window, and in enabled sources/topics.
-- Rank (deterministic): `source_trust + freshness + quality + constructive_score + topic_match - duplicate_penalty - seen_penalty - negative_feedback_penalty`.
-- Diversity: at most 2 stories per source and at most 3 per topic in one day's picks (relaxed only if there are too few candidates).
+- Candidates: `route = today` first, then `route = explore` to fill the quota when `today` has too few stories (measured supply is about 2.6 `today` and 5.9 `explore` per day). Excluded items are never candidates. All candidates must be unhidden, unseen, within the 14-day age window, and from enabled sources. **Stories picked on an earlier day never come back** (they count as seen).
+- Rank (deterministic): `0.25*trust + 0.25*freshness + 0.40*constructive_score + 0.10*topic_match(max 2) - seen_penalty(0.30) - source_penalty`. Freshness halves every 36 hours. Preferred topics are a **boost, not a filter** (a filter could starve the day); sources are filtered by the on-device enabled flag.
+- Selection passes, each by rank (ties: newest, then id, so input order never matters): (1) `today` stories, (2) `explore` stories, both with at most 2 per source and 3 per primary topic; if the quota is still unmet, (3) relax the topic cap, then (4) the source cap.
+- One story per duplicate cluster (see below); a cluster that already has a pick today, or a seen story, is skipped.
+- Picks are written once per local day and only ever appended: raising `stories_per_day` adds the next best stories, lowering it shows a prefix, a short day is topped up as more stories arrive.
 - Never optimize for engagement.
+
+## De-duplication
+`pipeline/dedupe.dart` assigns a `cluster_id` (the earliest member's id) to stories published within 3 days of each other that match by (A) near-identical headlines (token Jaccard >= 0.6) or (B) IDF-weighted title cosine >= 0.30 with at least 2 shared rare words. It favours precision: a false merge would hide a legitimate story, while a missed duplicate only shows the same news twice. Same-story pairs with different framing can be missed (see `evaluation-report.md`). Recomputed after each refresh for the last 8 days.
 
 ## Storage
 On-device SQLite via Drift: see `data-model.md`. Articles older than 30 days are pruned unless bookmarked. Bookmarks keep a snapshot (title, excerpt, source, url) for offline reading.

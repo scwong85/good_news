@@ -1,11 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:drift/native.dart';
 import 'package:good_news/data/db/app_database.dart';
 import 'package:good_news/data/http/feed_fetcher.dart';
 import 'package:good_news/data/sources/direct_rss_story_source.dart';
 import 'package:good_news/domain/source.dart' as domain;
+import 'package:good_news/classification/classification_service.dart';
 import 'package:good_news/ingestion/ingestion_service.dart';
+import 'package:good_news/pipeline/classifier.dart';
+import 'package:good_news/pipeline/normalize.dart';
+import 'package:good_news/pipeline/rules.dart';
+import 'package:good_news/selection/dedupe_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
@@ -51,6 +57,8 @@ class Harness {
     int concurrency = 4,
     Duration deadline = const Duration(seconds: 5),
     int retentionDays = 30,
+    bool classify = false,
+    List<Future<Object?> Function()> extraHooks = const [],
   }) {
     db = AppDatabase(NativeDatabase.memory());
     client = MockClient((request) async {
@@ -61,8 +69,17 @@ class Harness {
     });
     final fetcher = FeedFetcher(client,
         retryBackoff: Duration.zero, timeout: const Duration(seconds: 2), sleep: (_) async {});
+    if (classify) {
+      classification = ClassificationService(db, loadRules(), now: clock.call);
+    }
     service = IngestionService(
       db: db,
+      classification: classification,
+      afterRefresh: [
+        if (classification != null) classification!.reclassifyOutdated,
+        if (classify) DedupeService(db, now: clock.call).refreshClusters,
+        ...extraHooks,
+      ],
       storySource: DirectRssStorySource(fetcher, now: clock.call),
       now: clock.call,
       ttl: ttl,
@@ -77,6 +94,7 @@ class Harness {
   final clock = FakeClock();
   final requests = <http.BaseRequest>[];
   late final AppDatabase db;
+  ClassificationService? classification;
   late final http.Client client;
   late final IngestionService service;
 
@@ -87,3 +105,40 @@ class Harness {
 
 Future<http.Response> feed(List<int> body, {Map<String, String> headers = const {}}) async =>
     http.Response.bytes(body, 200, headers: headers);
+
+Rules loadRules() => Rules.parse(File('assets/rules/rules.json').readAsStringSync());
+
+/// Inserts one already-classified article (bypassing feeds), for selection tests.
+Future<String> addArticle(
+  AppDatabase db,
+  String sourceId, {
+  required String slug,
+  String? title,
+  String route = 'today',
+  double score = 0.6,
+  DateTime? publishedAt,
+  List<String> topics = const ['environment'],
+  DateTime? fetchedAt,
+}) async {
+  final url = 'https://$sourceId.example.com/$slug';
+  await db.insertNewArticles(
+    sourceId,
+    [
+      NormalizedItem(
+        externalId: url,
+        canonicalUrl: url,
+        title: title ?? 'Story $slug',
+        excerpt: 'Excerpt $slug',
+        publishedAt: publishedAt ?? DateTime.utc(2026, 10, 27, 10),
+        language: 'en',
+        regions: const ['global'],
+        topics: const [],
+      ),
+    ],
+    fetchedAt ?? DateTime.utc(2026, 10, 27, 11),
+    classifications: {
+      url: Classification(route: route, score: score, rulesVersion: 'test', topics: topics),
+    },
+  );
+  return articleIdFor(url);
+}

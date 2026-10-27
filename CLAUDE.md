@@ -12,7 +12,7 @@ Calm, trustworthy app that gives a small daily briefing (5-10 stories, user sett
 - Curated allowlist only. No broad discovery, no Tier 3.
 - Never republish full articles: headline + feed excerpt (<= 300 chars) + source + link to the original. Never fetch article pages.
 - Every classification has an explanation; rules are deterministic and versioned; change them only with an evaluation on the labeled set.
-- Classifier parity: the Python reference and the Dart port must agree on the labeled set.
+- Classifier parity: the Python reference and the Dart port must agree on `rules/golden_cases.jsonl` (all labeled articles + edge cases). Regex semantics are ASCII in both.
 - Fetch-on-open only; no background sync. Be a polite client: User-Agent, cache TTL 30 min, conditional GET, honor 429/Retry-After.
 - Privacy: no accounts, analytics or ads; data stays on the device; telemetry only if opt-in.
 - No LLM dependency.

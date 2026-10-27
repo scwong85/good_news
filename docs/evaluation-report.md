@@ -50,6 +50,11 @@ Classifying every article stored in the local database from the last 14 days (20
 - `today` stories came mostly from Good News Network (9), Mongabay (9), Happy Eco News (8) and Positive News (4).
 - So `today`-route stories alone will often not reach 5 per day. The daily selector must fill with the highest-scoring `explore` stories (score floor 0.42). Documented in `architecture.md` and `classification-rules.md`.
 
+## Dart port and de-duplication (Phase 4)
+- **Parity:** the Dart classifier matches the Python reference on all 306 golden cases (290 labeled articles + 16 synthetic Stage-1 and regex edge cases). The edge cases exposed a Unicode difference (`\\b`/`\\d`), fixed by making both implementations ASCII (decision #36); no labeled result changed. Dart tests also re-derive the Phase 2 metrics from the labels and match `baseline_metrics.json` on every split.
+- **De-duplication:** evaluated on the 111 labeled stories that the classifier shows. Plain title/excerpt similarity could not separate the true duplicate pairs from false ones (the mussel pair scored 0.22 against a highest false pair of 0.26), so the detector is deliberately conservative. Result: 0 false merges; it detects the hornbill-beak pair and misses the mussel pair (same story, different framing). The third labeled pair is excluded by the classifier before it reaches the de-duplicator. n = 2 evaluable pairs, so no recall estimate is meaningful; more labeled duplicate pairs are needed.
+- **Live check (2026-10-27):** 209 stories from 10 live feeds: 26 `today`, 56 `explore`, 127 `excluded`; 7 picks from 6 sources.
+
 ## Recommendations
 1. Have a person review the 290 draft labels (priority: the `test2` and borderline items), then re-run.
 2. Route accuracy (recall) is limited by title + excerpt input; the product-focused targets above replaced it (decision #30). Revisit if a richer signal becomes available.

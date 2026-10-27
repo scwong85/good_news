@@ -1914,11 +1914,705 @@ class ArticlesCompanion extends UpdateCompanion<ArticleRow> {
   }
 }
 
+class $DailyPicksTable extends DailyPicks
+    with TableInfo<$DailyPicksTable, DailyPickRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DailyPicksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _dayMeta = const VerificationMeta('day');
+  @override
+  late final GeneratedColumn<String> day = GeneratedColumn<String>(
+    'day',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _articleIdMeta = const VerificationMeta(
+    'articleId',
+  );
+  @override
+  late final GeneratedColumn<String> articleId = GeneratedColumn<String>(
+    'article_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES articles (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [day, position, articleId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'daily_picks';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DailyPickRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('day')) {
+      context.handle(
+        _dayMeta,
+        day.isAcceptableOrUnknown(data['day']!, _dayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dayMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    if (data.containsKey('article_id')) {
+      context.handle(
+        _articleIdMeta,
+        articleId.isAcceptableOrUnknown(data['article_id']!, _articleIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_articleIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {day, position};
+  @override
+  DailyPickRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DailyPickRow(
+      day: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      articleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}article_id'],
+      )!,
+    );
+  }
+
+  @override
+  $DailyPicksTable createAlias(String alias) {
+    return $DailyPicksTable(attachedDatabase, alias);
+  }
+}
+
+class DailyPickRow extends DataClass implements Insertable<DailyPickRow> {
+  /// Local date, `yyyy-MM-dd`.
+  final String day;
+  final int position;
+  final String articleId;
+  const DailyPickRow({
+    required this.day,
+    required this.position,
+    required this.articleId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['day'] = Variable<String>(day);
+    map['position'] = Variable<int>(position);
+    map['article_id'] = Variable<String>(articleId);
+    return map;
+  }
+
+  DailyPicksCompanion toCompanion(bool nullToAbsent) {
+    return DailyPicksCompanion(
+      day: Value(day),
+      position: Value(position),
+      articleId: Value(articleId),
+    );
+  }
+
+  factory DailyPickRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DailyPickRow(
+      day: serializer.fromJson<String>(json['day']),
+      position: serializer.fromJson<int>(json['position']),
+      articleId: serializer.fromJson<String>(json['articleId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'day': serializer.toJson<String>(day),
+      'position': serializer.toJson<int>(position),
+      'articleId': serializer.toJson<String>(articleId),
+    };
+  }
+
+  DailyPickRow copyWith({String? day, int? position, String? articleId}) =>
+      DailyPickRow(
+        day: day ?? this.day,
+        position: position ?? this.position,
+        articleId: articleId ?? this.articleId,
+      );
+  DailyPickRow copyWithCompanion(DailyPicksCompanion data) {
+    return DailyPickRow(
+      day: data.day.present ? data.day.value : this.day,
+      position: data.position.present ? data.position.value : this.position,
+      articleId: data.articleId.present ? data.articleId.value : this.articleId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DailyPickRow(')
+          ..write('day: $day, ')
+          ..write('position: $position, ')
+          ..write('articleId: $articleId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(day, position, articleId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DailyPickRow &&
+          other.day == this.day &&
+          other.position == this.position &&
+          other.articleId == this.articleId);
+}
+
+class DailyPicksCompanion extends UpdateCompanion<DailyPickRow> {
+  final Value<String> day;
+  final Value<int> position;
+  final Value<String> articleId;
+  final Value<int> rowid;
+  const DailyPicksCompanion({
+    this.day = const Value.absent(),
+    this.position = const Value.absent(),
+    this.articleId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DailyPicksCompanion.insert({
+    required String day,
+    required int position,
+    required String articleId,
+    this.rowid = const Value.absent(),
+  }) : day = Value(day),
+       position = Value(position),
+       articleId = Value(articleId);
+  static Insertable<DailyPickRow> custom({
+    Expression<String>? day,
+    Expression<int>? position,
+    Expression<String>? articleId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (day != null) 'day': day,
+      if (position != null) 'position': position,
+      if (articleId != null) 'article_id': articleId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DailyPicksCompanion copyWith({
+    Value<String>? day,
+    Value<int>? position,
+    Value<String>? articleId,
+    Value<int>? rowid,
+  }) {
+    return DailyPicksCompanion(
+      day: day ?? this.day,
+      position: position ?? this.position,
+      articleId: articleId ?? this.articleId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (day.present) {
+      map['day'] = Variable<String>(day.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (articleId.present) {
+      map['article_id'] = Variable<String>(articleId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DailyPicksCompanion(')
+          ..write('day: $day, ')
+          ..write('position: $position, ')
+          ..write('articleId: $articleId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $SeenTable extends Seen with TableInfo<$SeenTable, SeenRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SeenTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _articleIdMeta = const VerificationMeta(
+    'articleId',
+  );
+  @override
+  late final GeneratedColumn<String> articleId = GeneratedColumn<String>(
+    'article_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES articles (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _seenAtMeta = const VerificationMeta('seenAt');
+  @override
+  late final GeneratedColumn<DateTime> seenAt = GeneratedColumn<DateTime>(
+    'seen_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [articleId, seenAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'seen';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SeenRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('article_id')) {
+      context.handle(
+        _articleIdMeta,
+        articleId.isAcceptableOrUnknown(data['article_id']!, _articleIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_articleIdMeta);
+    }
+    if (data.containsKey('seen_at')) {
+      context.handle(
+        _seenAtMeta,
+        seenAt.isAcceptableOrUnknown(data['seen_at']!, _seenAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_seenAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {articleId};
+  @override
+  SeenRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SeenRow(
+      articleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}article_id'],
+      )!,
+      seenAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}seen_at'],
+      )!,
+    );
+  }
+
+  @override
+  $SeenTable createAlias(String alias) {
+    return $SeenTable(attachedDatabase, alias);
+  }
+}
+
+class SeenRow extends DataClass implements Insertable<SeenRow> {
+  final String articleId;
+  final DateTime seenAt;
+  const SeenRow({required this.articleId, required this.seenAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['article_id'] = Variable<String>(articleId);
+    map['seen_at'] = Variable<DateTime>(seenAt);
+    return map;
+  }
+
+  SeenCompanion toCompanion(bool nullToAbsent) {
+    return SeenCompanion(articleId: Value(articleId), seenAt: Value(seenAt));
+  }
+
+  factory SeenRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SeenRow(
+      articleId: serializer.fromJson<String>(json['articleId']),
+      seenAt: serializer.fromJson<DateTime>(json['seenAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'articleId': serializer.toJson<String>(articleId),
+      'seenAt': serializer.toJson<DateTime>(seenAt),
+    };
+  }
+
+  SeenRow copyWith({String? articleId, DateTime? seenAt}) => SeenRow(
+    articleId: articleId ?? this.articleId,
+    seenAt: seenAt ?? this.seenAt,
+  );
+  SeenRow copyWithCompanion(SeenCompanion data) {
+    return SeenRow(
+      articleId: data.articleId.present ? data.articleId.value : this.articleId,
+      seenAt: data.seenAt.present ? data.seenAt.value : this.seenAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SeenRow(')
+          ..write('articleId: $articleId, ')
+          ..write('seenAt: $seenAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(articleId, seenAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SeenRow &&
+          other.articleId == this.articleId &&
+          other.seenAt == this.seenAt);
+}
+
+class SeenCompanion extends UpdateCompanion<SeenRow> {
+  final Value<String> articleId;
+  final Value<DateTime> seenAt;
+  final Value<int> rowid;
+  const SeenCompanion({
+    this.articleId = const Value.absent(),
+    this.seenAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SeenCompanion.insert({
+    required String articleId,
+    required DateTime seenAt,
+    this.rowid = const Value.absent(),
+  }) : articleId = Value(articleId),
+       seenAt = Value(seenAt);
+  static Insertable<SeenRow> custom({
+    Expression<String>? articleId,
+    Expression<DateTime>? seenAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (articleId != null) 'article_id': articleId,
+      if (seenAt != null) 'seen_at': seenAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SeenCompanion copyWith({
+    Value<String>? articleId,
+    Value<DateTime>? seenAt,
+    Value<int>? rowid,
+  }) {
+    return SeenCompanion(
+      articleId: articleId ?? this.articleId,
+      seenAt: seenAt ?? this.seenAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (articleId.present) {
+      map['article_id'] = Variable<String>(articleId.value);
+    }
+    if (seenAt.present) {
+      map['seen_at'] = Variable<DateTime>(seenAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SeenCompanion(')
+          ..write('articleId: $articleId, ')
+          ..write('seenAt: $seenAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PreferenceEntriesTable extends PreferenceEntries
+    with TableInfo<$PreferenceEntriesTable, PreferenceRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PreferenceEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  @override
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<String> value = GeneratedColumn<String>(
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [key, value];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'preferences';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PreferenceRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('key')) {
+      context.handle(
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valueMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {key};
+  @override
+  PreferenceRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PreferenceRow(
+      key: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}key'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value'],
+      )!,
+    );
+  }
+
+  @override
+  $PreferenceEntriesTable createAlias(String alias) {
+    return $PreferenceEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class PreferenceRow extends DataClass implements Insertable<PreferenceRow> {
+  final String key;
+  final String value;
+  const PreferenceRow({required this.key, required this.value});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['key'] = Variable<String>(key);
+    map['value'] = Variable<String>(value);
+    return map;
+  }
+
+  PreferenceEntriesCompanion toCompanion(bool nullToAbsent) {
+    return PreferenceEntriesCompanion(key: Value(key), value: Value(value));
+  }
+
+  factory PreferenceRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PreferenceRow(
+      key: serializer.fromJson<String>(json['key']),
+      value: serializer.fromJson<String>(json['value']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'key': serializer.toJson<String>(key),
+      'value': serializer.toJson<String>(value),
+    };
+  }
+
+  PreferenceRow copyWith({String? key, String? value}) =>
+      PreferenceRow(key: key ?? this.key, value: value ?? this.value);
+  PreferenceRow copyWithCompanion(PreferenceEntriesCompanion data) {
+    return PreferenceRow(
+      key: data.key.present ? data.key.value : this.key,
+      value: data.value.present ? data.value.value : this.value,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PreferenceRow(')
+          ..write('key: $key, ')
+          ..write('value: $value')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(key, value);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PreferenceRow &&
+          other.key == this.key &&
+          other.value == this.value);
+}
+
+class PreferenceEntriesCompanion extends UpdateCompanion<PreferenceRow> {
+  final Value<String> key;
+  final Value<String> value;
+  final Value<int> rowid;
+  const PreferenceEntriesCompanion({
+    this.key = const Value.absent(),
+    this.value = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PreferenceEntriesCompanion.insert({
+    required String key,
+    required String value,
+    this.rowid = const Value.absent(),
+  }) : key = Value(key),
+       value = Value(value);
+  static Insertable<PreferenceRow> custom({
+    Expression<String>? key,
+    Expression<String>? value,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (key != null) 'key': key,
+      if (value != null) 'value': value,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PreferenceEntriesCompanion copyWith({
+    Value<String>? key,
+    Value<String>? value,
+    Value<int>? rowid,
+  }) {
+    return PreferenceEntriesCompanion(
+      key: key ?? this.key,
+      value: value ?? this.value,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<String>(value.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PreferenceEntriesCompanion(')
+          ..write('key: $key, ')
+          ..write('value: $value, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $SourcesTable sources = $SourcesTable(this);
   late final $ArticlesTable articles = $ArticlesTable(this);
+  late final $DailyPicksTable dailyPicks = $DailyPicksTable(this);
+  late final $SeenTable seen = $SeenTable(this);
+  late final $PreferenceEntriesTable preferenceEntries =
+      $PreferenceEntriesTable(this);
   late final Index articlesRoutePublished = Index(
     'articles_route_published',
     'CREATE INDEX articles_route_published ON articles (route, published_at)',
@@ -1930,8 +2624,28 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     sources,
     articles,
+    dailyPicks,
+    seen,
+    preferenceEntries,
     articlesRoutePublished,
   ];
+  @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'articles',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('daily_picks', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'articles',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('seen', kind: UpdateKind.delete)],
+    ),
+  ]);
 }
 
 typedef $$SourcesTableCreateCompanionBuilder = SourcesCompanion Function({
@@ -2500,6 +3214,43 @@ final class $$ArticlesTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<$DailyPicksTable, List<DailyPickRow>>
+  _dailyPicksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.dailyPicks,
+    aliasName: 'articles__id__daily_picks__article_id',
+  );
+
+  $$DailyPicksTableProcessedTableManager get dailyPicksRefs {
+    final manager = $$DailyPicksTableTableManager(
+      $_db,
+      $_db.dailyPicks,
+    ).filter((f) => f.articleId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_dailyPicksRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$SeenTable, List<SeenRow>> _seenRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.seen,
+    aliasName: 'articles__id__seen__article_id',
+  );
+
+  $$SeenTableProcessedTableManager get seenRefs {
+    final manager = $$SeenTableTableManager(
+      $_db,
+      $_db.seen,
+    ).filter((f) => f.articleId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_seenRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$ArticlesTableFilterComposer
@@ -2621,6 +3372,56 @@ class $$ArticlesTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> dailyPicksRefs(
+    Expression<bool> Function($$DailyPicksTableFilterComposer f) f,
+  ) {
+    final $$DailyPicksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.dailyPicks,
+      getReferencedColumn: (t) => t.articleId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DailyPicksTableFilterComposer(
+            $db: $db,
+            $table: $db.dailyPicks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> seenRefs(
+    Expression<bool> Function($$SeenTableFilterComposer f) f,
+  ) {
+    final $$SeenTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.seen,
+      getReferencedColumn: (t) => t.articleId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SeenTableFilterComposer(
+            $db: $db,
+            $table: $db.seen,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -2840,6 +3641,56 @@ class $$ArticlesTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> dailyPicksRefs<T extends Object>(
+    Expression<T> Function($$DailyPicksTableAnnotationComposer a) f,
+  ) {
+    final $$DailyPicksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.dailyPicks,
+      getReferencedColumn: (t) => t.articleId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DailyPicksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.dailyPicks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> seenRefs<T extends Object>(
+    Expression<T> Function($$SeenTableAnnotationComposer a) f,
+  ) {
+    final $$SeenTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.seen,
+      getReferencedColumn: (t) => t.articleId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SeenTableAnnotationComposer(
+            $db: $db,
+            $table: $db.seen,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ArticlesTableTableManager
@@ -2855,7 +3706,11 @@ class $$ArticlesTableTableManager
           $$ArticlesTableUpdateCompanionBuilder,
           (ArticleRow, $$ArticlesTableReferences),
           ArticleRow,
-          PrefetchHooks Function({bool sourceId})
+          PrefetchHooks Function({
+            bool sourceId,
+            bool dailyPicksRefs,
+            bool seenRefs,
+          })
         > {
   $$ArticlesTableTableManager(_$AppDatabase db, $ArticlesTable table)
     : super(
@@ -2960,7 +3815,327 @@ class $$ArticlesTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({sourceId = false}) {
+          prefetchHooksCallback:
+              ({sourceId = false, dailyPicksRefs = false, seenRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (dailyPicksRefs) db.dailyPicks,
+                    if (seenRefs) db.seen,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (sourceId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.sourceId,
+                            referencedTable: $$ArticlesTableReferences
+                                ._sourceIdTable(db),
+                            referencedColumn: $$ArticlesTableReferences
+                                ._sourceIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (dailyPicksRefs)
+                        await $_getPrefetchedDataByColumns<
+                          ArticleRow,
+                          $ArticlesTable,
+                          DailyPickRow,
+                          $DailyPicksTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ArticlesTableReferences
+                              ._dailyPicksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ArticlesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).dailyPicksRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'article_id',
+                          typedResults: items,
+                        ),
+                      if (seenRefs)
+                        await $_getPrefetchedDataByColumns<
+                          ArticleRow,
+                          $ArticlesTable,
+                          SeenRow,
+                          $SeenTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ArticlesTableReferences
+                              ._seenRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ArticlesTableReferences(db, table, p0).seenRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'article_id',
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$ArticlesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ArticlesTable,
+      ArticleRow,
+      $$ArticlesTableFilterComposer,
+      $$ArticlesTableOrderingComposer,
+      $$ArticlesTableAnnotationComposer,
+      $$ArticlesTableCreateCompanionBuilder,
+      $$ArticlesTableUpdateCompanionBuilder,
+      (ArticleRow, $$ArticlesTableReferences),
+      ArticleRow,
+      PrefetchHooks Function({
+        bool sourceId,
+        bool dailyPicksRefs,
+        bool seenRefs,
+      })
+    >;
+typedef $$DailyPicksTableCreateCompanionBuilder = DailyPicksCompanion Function({
+  required String day,
+  required int position,
+  required String articleId,
+  Value<int> rowid,
+});
+typedef $$DailyPicksTableUpdateCompanionBuilder = DailyPicksCompanion Function({
+  Value<String> day,
+  Value<int> position,
+  Value<String> articleId,
+  Value<int> rowid,
+});
+
+final class $$DailyPicksTableReferences
+    extends BaseReferences<_$AppDatabase, $DailyPicksTable, DailyPickRow> {
+  $$DailyPicksTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ArticlesTable _articleIdTable(_$AppDatabase db) =>
+      db.articles.createAlias('daily_picks__article_id__articles__id');
+
+  $$ArticlesTableProcessedTableManager get articleId {
+    final $_column = $_itemColumn<String>('article_id')!;
+
+    final manager = $$ArticlesTableTableManager(
+      $_db,
+      $_db.articles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_articleIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$DailyPicksTableFilterComposer
+    extends Composer<_$AppDatabase, $DailyPicksTable> {
+  $$DailyPicksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ArticlesTableFilterComposer get articleId {
+    final $$ArticlesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.articleId,
+      referencedTable: $db.articles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ArticlesTableFilterComposer(
+            $db: $db,
+            $table: $db.articles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DailyPicksTableOrderingComposer
+    extends Composer<_$AppDatabase, $DailyPicksTable> {
+  $$DailyPicksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ArticlesTableOrderingComposer get articleId {
+    final $$ArticlesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.articleId,
+      referencedTable: $db.articles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ArticlesTableOrderingComposer(
+            $db: $db,
+            $table: $db.articles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DailyPicksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DailyPicksTable> {
+  $$DailyPicksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get day =>
+      $composableBuilder(column: $table.day, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  $$ArticlesTableAnnotationComposer get articleId {
+    final $$ArticlesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.articleId,
+      referencedTable: $db.articles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ArticlesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.articles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DailyPicksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DailyPicksTable,
+          DailyPickRow,
+          $$DailyPicksTableFilterComposer,
+          $$DailyPicksTableOrderingComposer,
+          $$DailyPicksTableAnnotationComposer,
+          $$DailyPicksTableCreateCompanionBuilder,
+          $$DailyPicksTableUpdateCompanionBuilder,
+          (DailyPickRow, $$DailyPicksTableReferences),
+          DailyPickRow,
+          PrefetchHooks Function({bool articleId})
+        > {
+  $$DailyPicksTableTableManager(_$AppDatabase db, $DailyPicksTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DailyPicksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DailyPicksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DailyPicksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> day = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<String> articleId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DailyPicksCompanion(
+                day: day,
+                position: position,
+                articleId: articleId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String day,
+                required int position,
+                required String articleId,
+                Value<int> rowid = const Value.absent(),
+              }) => DailyPicksCompanion.insert(
+                day: day,
+                position: position,
+                articleId: articleId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DailyPicksTable, DailyPickRow>(table),
+                  $$DailyPicksTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({articleId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -2980,14 +4155,14 @@ class $$ArticlesTableTableManager
                       dynamic
                     >
                   >(state) {
-                    if (sourceId) {
+                    if (articleId) {
                       state = state.withJoin(
                         currentTable: table,
-                        currentColumn: table.sourceId,
-                        referencedTable: $$ArticlesTableReferences
-                            ._sourceIdTable(db),
-                        referencedColumn: $$ArticlesTableReferences
-                            ._sourceIdTable(db)
+                        currentColumn: table.articleId,
+                        referencedTable: $$DailyPicksTableReferences
+                            ._articleIdTable(db),
+                        referencedColumn: $$DailyPicksTableReferences
+                            ._articleIdTable(db)
                             .id,
                       ) as T;
                     }
@@ -3003,19 +4178,435 @@ class $$ArticlesTableTableManager
       );
 }
 
-typedef $$ArticlesTableProcessedTableManager =
+typedef $$DailyPicksTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $ArticlesTable,
-      ArticleRow,
-      $$ArticlesTableFilterComposer,
-      $$ArticlesTableOrderingComposer,
-      $$ArticlesTableAnnotationComposer,
-      $$ArticlesTableCreateCompanionBuilder,
-      $$ArticlesTableUpdateCompanionBuilder,
-      (ArticleRow, $$ArticlesTableReferences),
-      ArticleRow,
-      PrefetchHooks Function({bool sourceId})
+      $DailyPicksTable,
+      DailyPickRow,
+      $$DailyPicksTableFilterComposer,
+      $$DailyPicksTableOrderingComposer,
+      $$DailyPicksTableAnnotationComposer,
+      $$DailyPicksTableCreateCompanionBuilder,
+      $$DailyPicksTableUpdateCompanionBuilder,
+      (DailyPickRow, $$DailyPicksTableReferences),
+      DailyPickRow,
+      PrefetchHooks Function({bool articleId})
+    >;
+typedef $$SeenTableCreateCompanionBuilder = SeenCompanion Function({
+  required String articleId,
+  required DateTime seenAt,
+  Value<int> rowid,
+});
+typedef $$SeenTableUpdateCompanionBuilder = SeenCompanion Function({
+  Value<String> articleId,
+  Value<DateTime> seenAt,
+  Value<int> rowid,
+});
+
+final class $$SeenTableReferences
+    extends BaseReferences<_$AppDatabase, $SeenTable, SeenRow> {
+  $$SeenTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ArticlesTable _articleIdTable(_$AppDatabase db) =>
+      db.articles.createAlias('seen__article_id__articles__id');
+
+  $$ArticlesTableProcessedTableManager get articleId {
+    final $_column = $_itemColumn<String>('article_id')!;
+
+    final manager = $$ArticlesTableTableManager(
+      $_db,
+      $_db.articles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_articleIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$SeenTableFilterComposer extends Composer<_$AppDatabase, $SeenTable> {
+  $$SeenTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<DateTime> get seenAt => $composableBuilder(
+    column: $table.seenAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ArticlesTableFilterComposer get articleId {
+    final $$ArticlesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.articleId,
+      referencedTable: $db.articles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ArticlesTableFilterComposer(
+            $db: $db,
+            $table: $db.articles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SeenTableOrderingComposer extends Composer<_$AppDatabase, $SeenTable> {
+  $$SeenTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<DateTime> get seenAt => $composableBuilder(
+    column: $table.seenAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ArticlesTableOrderingComposer get articleId {
+    final $$ArticlesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.articleId,
+      referencedTable: $db.articles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ArticlesTableOrderingComposer(
+            $db: $db,
+            $table: $db.articles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SeenTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SeenTable> {
+  $$SeenTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<DateTime> get seenAt =>
+      $composableBuilder(column: $table.seenAt, builder: (column) => column);
+
+  $$ArticlesTableAnnotationComposer get articleId {
+    final $$ArticlesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.articleId,
+      referencedTable: $db.articles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ArticlesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.articles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SeenTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SeenTable,
+          SeenRow,
+          $$SeenTableFilterComposer,
+          $$SeenTableOrderingComposer,
+          $$SeenTableAnnotationComposer,
+          $$SeenTableCreateCompanionBuilder,
+          $$SeenTableUpdateCompanionBuilder,
+          (SeenRow, $$SeenTableReferences),
+          SeenRow,
+          PrefetchHooks Function({bool articleId})
+        > {
+  $$SeenTableTableManager(_$AppDatabase db, $SeenTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SeenTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SeenTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SeenTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> articleId = const Value.absent(),
+                Value<DateTime> seenAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SeenCompanion(
+                articleId: articleId,
+                seenAt: seenAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String articleId,
+                required DateTime seenAt,
+                Value<int> rowid = const Value.absent(),
+              }) => SeenCompanion.insert(
+                articleId: articleId,
+                seenAt: seenAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$SeenTable, SeenRow>(table),
+                  $$SeenTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({articleId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (articleId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.articleId,
+                        referencedTable: $$SeenTableReferences._articleIdTable(
+                          db,
+                        ),
+                        referencedColumn: $$SeenTableReferences
+                            ._articleIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$SeenTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SeenTable,
+      SeenRow,
+      $$SeenTableFilterComposer,
+      $$SeenTableOrderingComposer,
+      $$SeenTableAnnotationComposer,
+      $$SeenTableCreateCompanionBuilder,
+      $$SeenTableUpdateCompanionBuilder,
+      (SeenRow, $$SeenTableReferences),
+      SeenRow,
+      PrefetchHooks Function({bool articleId})
+    >;
+typedef $$PreferenceEntriesTableCreateCompanionBuilder =
+    PreferenceEntriesCompanion Function({
+      required String key,
+      required String value,
+      Value<int> rowid,
+    });
+typedef $$PreferenceEntriesTableUpdateCompanionBuilder =
+    PreferenceEntriesCompanion Function({
+      Value<String> key,
+      Value<String> value,
+      Value<int> rowid,
+    });
+
+class $$PreferenceEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $PreferenceEntriesTable> {
+  $$PreferenceEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PreferenceEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $PreferenceEntriesTable> {
+  $$PreferenceEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PreferenceEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PreferenceEntriesTable> {
+  $$PreferenceEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
+  GeneratedColumn<String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+}
+
+class $$PreferenceEntriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PreferenceEntriesTable,
+          PreferenceRow,
+          $$PreferenceEntriesTableFilterComposer,
+          $$PreferenceEntriesTableOrderingComposer,
+          $$PreferenceEntriesTableAnnotationComposer,
+          $$PreferenceEntriesTableCreateCompanionBuilder,
+          $$PreferenceEntriesTableUpdateCompanionBuilder,
+          (
+            PreferenceRow,
+            BaseReferences<
+              _$AppDatabase,
+              $PreferenceEntriesTable,
+              PreferenceRow
+            >,
+          ),
+          PreferenceRow,
+          PrefetchHooks Function()
+        > {
+  $$PreferenceEntriesTableTableManager(
+    _$AppDatabase db,
+    $PreferenceEntriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PreferenceEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PreferenceEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PreferenceEntriesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> key = const Value.absent(),
+                Value<String> value = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PreferenceEntriesCompanion(
+                key: key,
+                value: value,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String key,
+                required String value,
+                Value<int> rowid = const Value.absent(),
+              }) => PreferenceEntriesCompanion.insert(
+                key: key,
+                value: value,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PreferenceEntriesTable, PreferenceRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $PreferenceEntriesTable,
+                    PreferenceRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PreferenceEntriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PreferenceEntriesTable,
+      PreferenceRow,
+      $$PreferenceEntriesTableFilterComposer,
+      $$PreferenceEntriesTableOrderingComposer,
+      $$PreferenceEntriesTableAnnotationComposer,
+      $$PreferenceEntriesTableCreateCompanionBuilder,
+      $$PreferenceEntriesTableUpdateCompanionBuilder,
+      (
+        PreferenceRow,
+        BaseReferences<_$AppDatabase, $PreferenceEntriesTable, PreferenceRow>,
+      ),
+      PreferenceRow,
+      PrefetchHooks Function()
     >;
 
 class $AppDatabaseManager {
@@ -3025,4 +4616,9 @@ class $AppDatabaseManager {
       $$SourcesTableTableManager(_db, _db.sources);
   $$ArticlesTableTableManager get articles =>
       $$ArticlesTableTableManager(_db, _db.articles);
+  $$DailyPicksTableTableManager get dailyPicks =>
+      $$DailyPicksTableTableManager(_db, _db.dailyPicks);
+  $$SeenTableTableManager get seen => $$SeenTableTableManager(_db, _db.seen);
+  $$PreferenceEntriesTableTableManager get preferenceEntries =>
+      $$PreferenceEntriesTableTableManager(_db, _db.preferenceEntries);
 }

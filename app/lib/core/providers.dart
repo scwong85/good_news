@@ -10,7 +10,12 @@ import '../data/http/feed_fetcher.dart';
 import '../data/sources/direct_rss_story_source.dart';
 import '../data/sources/story_source.dart';
 import '../domain/source.dart';
+import '../classification/classification_service.dart';
 import '../ingestion/ingestion_service.dart';
+import '../pipeline/rules.dart';
+import '../selection/daily_picks_service.dart';
+import '../selection/dedupe_service.dart';
+import '../selection/preferences.dart';
 
 final databaseProvider = Provider<AppDatabase>((ref) {
   final db = AppDatabase(driftDatabase(name: 'good_news'));
@@ -28,12 +33,34 @@ final storySourceProvider = Provider<StorySource>(
   (ref) => DirectRssStorySource(FeedFetcher(ref.watch(httpClientProvider))),
 );
 
-final ingestionServiceProvider = Provider<IngestionService>(
-  (ref) => IngestionService(
+/// The bundled classification rules (assets/rules/rules.json, synced from /rules).
+final rulesProvider = FutureProvider<Rules>(
+  (ref) async => Rules.parse(await rootBundle.loadString('assets/rules/rules.json')),
+);
+
+final classificationServiceProvider = FutureProvider<ClassificationService>(
+  (ref) async => ClassificationService(ref.watch(databaseProvider), await ref.watch(rulesProvider.future)),
+);
+
+final dedupeServiceProvider = Provider<DedupeService>((ref) => DedupeService(ref.watch(databaseProvider)));
+
+final preferencesRepositoryProvider =
+    Provider<PreferencesRepository>((ref) => PreferencesRepository(ref.watch(databaseProvider)));
+
+final dailyPicksServiceProvider = Provider<DailyPicksService>(
+  (ref) => DailyPicksService(ref.watch(databaseProvider), ref.watch(preferencesRepositoryProvider)),
+);
+
+final ingestionServiceProvider = FutureProvider<IngestionService>((ref) async {
+  final classification = await ref.watch(classificationServiceProvider.future);
+  final dedupe = ref.watch(dedupeServiceProvider);
+  return IngestionService(
     db: ref.watch(databaseProvider),
     storySource: ref.watch(storySourceProvider),
-  ),
-);
+    classification: classification,
+    afterRefresh: [classification.reclassifyOutdated, dedupe.refreshClusters],
+  );
+});
 
 /// Loads the bundled source list (generated from docs/source-allowlist.csv).
 Future<List<Source>> loadBundledSources(Future<String> Function(String) load) async {

@@ -2,7 +2,7 @@
 
 **App (Dart/Flutter):** `flutter test` (unit + widget), `integration_test` on an emulator, `flutter analyze`, `dart format`.
 **Reference pipeline (Python):** pytest (Postgres required), ruff. Used for rules evaluation and the Dart parity test.
-Current Dart suite: 113 tests (`flutter test`); `dart run tool/live_ingest.dart` is a manual live-feed check, not part of the suite.
+Current Dart suite: 226 tests (`flutter test`) covering the pipeline, fetcher, database (including the v1 -> v2 migration), ingestion, classification parity and metrics, de-duplication, ranking, selection and the picks service; `dart run tool/live_ingest.dart` is a manual live-feed check, not part of the suite.
 Tests never use the live network: HTTP is mocked and feeds come from fixtures (`app/test/fixtures/feeds/`, generated or snapshotted from real feeds, including malformed, empty, huge and non-UTF8 cases).
 
 ## Unit (Dart)

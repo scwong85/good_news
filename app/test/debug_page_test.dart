@@ -44,7 +44,8 @@ void main() {
     await tester.pump();
 
     expect(find.text('Stored articles: 1'), findsOneWidget);
-    expect(find.text('Wetlands restored'), findsOneWidget);
+    expect(find.text('Wetlands restored'), findsWidgets); // in picks and in the latest list
+    expect(find.textContaining("Today's picks"), findsOneWidget);
     expect(find.text('Last refresh: 1 new, 1 source(s) failed'), findsOneWidget);
     expect(find.text('Source ok'), findsOneWidget);
     expect(find.textContaining('error: HTTP 500'), findsOneWidget);

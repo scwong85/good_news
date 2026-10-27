@@ -9,4 +9,5 @@ description: Transparent rule-based constructive scoring, topic/region/story-typ
 - Input is title + excerpt + feed categories + source metadata only. Output: score, route (`today|explore|excluded`), topics, regions, story_types, evidence_signals, and an explanation (feature, weight, matched text). No randomness, no network.
 - Routing has no human in the loop, so keep `today` conservative (evidence signal or highly trusted source).
 - Change rules only with an evaluation run on data/seed_labels.jsonl (dev/held-out split; never tune on the held-out set). Targets: `today` precision >= 85%, Tier-1 route accuracy >= 80%.
-- Python reference and Dart implementation must agree on every labeled item (parity test).
+- Python reference and Dart implementation must agree on every golden case (`rules/golden_cases.jsonl`, parity test in `app/test/classification`). Regex semantics are ASCII in both; whitespace is collapsed before matching.
+- After changing rules or engine behaviour: `python -m classifier.export_golden`, `python -m classifier.evaluate --write-baseline`, `scripts/sync-rules.sh`, then run both test suites.

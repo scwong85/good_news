@@ -65,3 +65,39 @@ class Articles extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// The stories chosen for a local calendar day. Written once per day, extended (never
+/// reordered or shortened) when stories_per_day increases.
+@DataClassName('DailyPickRow')
+class DailyPicks extends Table {
+  /// Local date, `yyyy-MM-dd`.
+  TextColumn get day => text()();
+  IntColumn get position => integer()();
+  TextColumn get articleId => text().references(Articles, #id, onDelete: KeyAction.cascade)();
+
+  @override
+  Set<Column> get primaryKey => {day, position};
+}
+
+/// Articles the reader has already seen (opened or shown as a pick).
+@DataClassName('SeenRow')
+class Seen extends Table {
+  TextColumn get articleId => text().references(Articles, #id, onDelete: KeyAction.cascade)();
+  DateTimeColumn get seenAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {articleId};
+}
+
+/// Key-value reader preferences (stories_per_day, topics, regions, ...).
+@DataClassName('PreferenceRow')
+class PreferenceEntries extends Table {
+  @override
+  String get tableName => 'preferences';
+
+  TextColumn get key => text()();
+  TextColumn get value => text()();
+
+  @override
+  Set<Column> get primaryKey => {key};
+}

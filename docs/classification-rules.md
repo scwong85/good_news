@@ -22,6 +22,8 @@ With about 2.6 `today` stories per day on average, the selector takes `today` st
 ## Portability rules for `rules.json` (so Dart matches Python)
 Patterns use only syntax common to Python `re` and Dart `RegExp`: no inline flags, no named groups, no possessive quantifiers; case-insensitivity comes from `flags`. Matching is `search` (anywhere); the first match is recorded. Weights are summed in file order. Topic and story-type keyword tables are always case-insensitive.
 
+**ASCII semantics (both implementations):** `\\b`, `\\w`, `\\d` only know ASCII letters and digits (the Python reference compiles with `re.ASCII`; Dart's `RegExp` behaves this way natively), so a non-ASCII letter does not extend a word. Runs of whitespace in the title, excerpt and text are collapsed to one space before matching. This was found by edge cases in `rules/golden_cases.jsonl`; it did not change any result on the 290 labeled articles, so the rules version is unchanged.
+
 ## Changing rules
 1. Edit `rules/rules.json` (bump `rules_version`).
 2. `python -m classifier.evaluate --split tune` (never tune on `test2`).

@@ -34,6 +34,10 @@ Status: **active**, or **superseded by #n**.
 | 28 | Evaluation uses blind held-out label batches; a split that has been used for tuning is never reused as held-out. All labels are Claude drafts pending human review | 2026-10-27 | active |
 | 29 | YES! Magazine trust lowered 0.85 -> 0.60 (0 of 8 dev items constructive) | 2026-10-27 | active |
 | 30 | Phase 2 acceptance revised: Tier-1 route accuracy (>= 80%) replaced by `shown` precision >= 75% alongside `today` precision >= 85%. Chosen after seeing 73.3% route accuracy on the blind set, so it is not a pre-registered target. | 2026-10-27 | active |
+| 35 | De-duplication is title-only, two high-precision tiers (Jaccard >= 0.6, or IDF cosine >= 0.30 with >= 2 shared rare words), 3-day window, no embeddings. Chosen after testing on the labeled pairs: plain similarity could not separate the true pairs from false ones. Known miss: same story with different framing (labeled mussel pair) | 2026-10-27 | active |
+| 36 | Regex semantics are ASCII in both implementations (Python `re.ASCII`; whitespace collapsed first). Found by golden edge cases; no change to the 290 labeled results, so no rules-version bump | 2026-10-27 | active |
+| 37 | Ranking weights (0.25 trust, 0.25 freshness, 0.40 constructive, 0.10 topic boost, 0.30 seen penalty) and the four-pass selector (today, explore, relax topic cap, relax source cap). Preferred topics boost rather than filter. Previous days' picks never repeat. Picks are append-only per local day | 2026-10-27 | active |
+| 38 | On-device DB schema v2 adds `daily_picks`, `seen`, `preferences` with a tested v1 -> v2 migration (drift schema tooling in `app/drift_schemas`) | 2026-10-27 | active |
 | 25 | State management Riverpod, storage Drift/SQLite, routing go_router | 2026-10-27 | active for Riverpod 3 (DI only so far) and Drift; go_router still proposed (Phase 5) |
 | 31 | Dart port differences from the Python reference: no language detection (items use the source's language), no Unicode NFC normalization, own XML sanitizer (bare `&`, HTML named entities, control chars, BOM, ISO-8859-1) because the `xml` package is strict. URL canonicalization is checked against the Python output (`app/test/fixtures/golden_urls.json`, 41 cases) | 2026-10-27 | active |
 | 32 | Phase 3 libraries: `http`, `xml`, `html`, `crypto`, `drift` + `drift_flutter`, `flutter_riverpod`. Drift row classes are `SourceRow`/`ArticleRow`; generated code is committed; Drift returns local-time `DateTime`s, so compare instants/UTC | 2026-10-27 | active |
@@ -46,7 +50,7 @@ Status: **active**, or **superseded by #n**.
 - Contact address for takedown requests; privacy policy hosting (needed for the Play Store).
 - Project name, application id and Play Store account.
 - Web milestone: GitHub Pages vs Netlify, and the scheduler for the export job.
-- **Phase 3 device check:** build and run the app on an Android device/emulator (not possible in the cloud session) and confirm the harness screen fetches and lists stories.
+- **Phase 3/4 device check:** build and run the app on an Android device/emulator (not possible in the cloud session) and confirm the harness screen fetches and lists stories.
 - Application id and app name (currently `com.example.good_news` / "Good News").
 - Squirrel News feed 404s; find a working feed or drop the source.
 - Flutter 3.47 is installed at `/opt/flutter` in the cloud session; the Android SDK is not.
@@ -58,7 +62,7 @@ Status: **active**, or **superseded by #n**.
 | 1 Python reference pipeline | Done (reference only, `tools/pipeline-prototype`) |
 | 2 Shared classification rules | Done (revised targets met): rules 2026.11.2, Python reference, evaluator, golden cases, 93 tests, evaluation report |
 | 3 Flutter app foundation (Android) | Done in code: models, fetcher, parser, normalizer, Drift DB, ingestion service, harness screen, 113 tests, live-feed check. **Not yet built or run on a device/emulator** |
-| 4 On-device classification, de-dup, daily selection | Not started |
+| 4 On-device classification, de-dup, daily selection | Done in code: Dart classifier (306/306 golden cases), title de-duplication, ranker, selector, picks service, DB v2 + migration, 226 tests, live-feed check. Acceptance (3) partly met (see plan). **Not yet run on a device** |
 | 5 Android UI | Not started |
 | 6 Android hardening and release | Not started |
 | Future A: Web via static JSON | Future |
