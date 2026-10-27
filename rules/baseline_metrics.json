@@ -1,0 +1,43 @@
+{
+ "dev": {
+  "n": 102,
+  "route_accuracy": 0.794,
+  "tier1_route_accuracy": 0.815,
+  "today_precision": 1.0,
+  "today_recall": 0.25,
+  "today_predicted": 12,
+  "shown_precision": 0.787,
+  "shown_recall": 0.771
+ },
+ "rules_version": "2026.11.2",
+ "dev2": {
+  "n": 92,
+  "route_accuracy": 0.826,
+  "tier1_route_accuracy": 0.829,
+  "today_precision": 0.857,
+  "today_recall": 0.333,
+  "today_predicted": 14,
+  "shown_precision": 0.857,
+  "shown_recall": 0.667
+ },
+ "tune": {
+  "n": 194,
+  "route_accuracy": 0.809,
+  "tier1_route_accuracy": 0.822,
+  "today_precision": 0.923,
+  "today_recall": 0.286,
+  "today_predicted": 26,
+  "shown_precision": 0.813,
+  "shown_recall": 0.726
+ },
+ "test2": {
+  "n": 96,
+  "route_accuracy": 0.729,
+  "tier1_route_accuracy": 0.733,
+  "today_precision": 0.923,
+  "today_recall": 0.273,
+  "today_predicted": 13,
+  "shown_precision": 0.75,
+  "shown_recall": 0.614
+ }
+}

@@ -8,6 +8,7 @@
 
 - `label`: `constructive` | `rejected`. Rejected rows set `rejection_reason` from `docs/editorial-policy.md`.
 - Use only real articles; store headline + short excerpt + URL only (no full text).
+- `split`: `dev` (102, used for tuning), `dev2` (92, blind at first, then used for tuning), `test2` (96, blind held-out; do not tune on it). Never reuse a tuned split as held-out; create a fresh batch instead.
 - `duplicate_group` (optional): same story seen in several feeds, used to evaluate deduplication.
 - Current file: 102 real items from 10 feeds (first items in each feed on 2026-10-27; 48 constructive, 54 rejected). Labels are a **draft by Claude** against `docs/editorial-policy.md`, notes mark borderline cases. A human editor should review them before they are used for evaluation or training.
 - Excerpts are truncated to 200 characters from the RSS description.

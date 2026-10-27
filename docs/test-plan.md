@@ -12,7 +12,7 @@ Fetch-on-open with mocked HTTP: parallel fetch, per-source isolation, timeouts, 
 
 ## Parity and evaluation
 - Dart classifier output equals the Python reference on every item in `data/seed_labels.jsonl` (route equal, score within 1e-6).
-- Held-out metrics: `today` precision >= 85%, Tier-1 route accuracy >= 80%; per-story-type precision/recall/F1 reported.
+- Held-out metrics (`test2`): `today` precision >= 85%, Tier-1 route accuracy >= 80% (currently 92.3% / 73.3%); per-story-type precision/recall/F1 reported. A regression test compares against `rules/baseline_metrics.json`.
 - De-duplication: all `duplicate_group` pairs in the labeled set detected; no false merges across different stories in the set.
 - Re-review a random sample of live picks manually after every rules change.
 

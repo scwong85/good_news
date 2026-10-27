@@ -53,7 +53,7 @@ Overall deadline for a refresh: 15 s. Honor `429`/`Retry-After`: back off that s
 
 ## Daily selection (5 to 10 stories, user setting)
 - "Day" is the device's local calendar day. `stories_per_day` is an integer 5-10 (default 5).
-- Candidates: `route = today`, not hidden, not seen, published within the age window, in enabled sources/topics.
+- Candidates: `route = today` first, then `route = explore` with the highest scores (floor 0.42) to fill the quota when `today` has too few stories (measured supply is about 2.6 `today` and 5.9 `explore` per day). Excluded items are never candidates. All candidates must be unhidden, unseen, within the age window, and in enabled sources/topics.
 - Rank (deterministic): `source_trust + freshness + quality + constructive_score + topic_match - duplicate_penalty - seen_penalty - negative_feedback_penalty`.
 - Diversity: at most 2 stories per source and at most 3 per topic in one day's picks (relaxed only if there are too few candidates).
 - Never optimize for engagement.

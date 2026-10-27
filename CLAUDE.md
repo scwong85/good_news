@@ -6,7 +6,7 @@ Calm, trustworthy app that gives a small daily briefing (5-10 stories, user sett
 **Client-side first.** A Flutter app (Android first, in `app/`) fetches the curated RSS feeds itself when opened, then parses, filters, classifies (rules in `rules/rules.json`), de-duplicates and selects the day's picks on the device, stored in SQLite. There is no server we operate and no background fetching. The **web app is a future milestone** that reads pre-built static JSON (browsers block direct feed reads). `tools/pipeline-prototype/` is the Python/Django reference pipeline (Phase 1, done): used for rules evaluation and the future web export, not deployed.
 
 ## Shared context (keep these current)
-`docs/`: product-brief, architecture, implementation-plan, editorial-policy, source-allowlist.csv, classification-rules, data-model (on-device), static-feed-contract (future), pipeline-hooks, test-plan, deployment, decision-log. Data: `data/seed_labels.jsonl` (draft labels, human review pending). Rules: `rules/`.
+`docs/`: product-brief, architecture, implementation-plan, evaluation-report, editorial-policy, source-allowlist.csv, classification-rules, data-model (on-device), static-feed-contract (future), pipeline-hooks, test-plan, deployment, decision-log. Data: `data/seed_labels.jsonl` (draft labels, human review pending). Rules: `rules/` (`rules.json`, `golden_cases.jsonl`, `baseline_metrics.json`); evaluation: `docs/evaluation-report.md`.
 
 ## Non-negotiables
 - Curated allowlist only. No broad discovery, no Tier 3.

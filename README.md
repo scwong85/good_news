@@ -4,12 +4,12 @@ A calm Android app (web later) that gives you 5 to 10 credible, constructive new
 
 - Product, architecture and plan: [`docs/`](docs/) (start with [`product-brief.md`](docs/product-brief.md), [`architecture.md`](docs/architecture.md), [`implementation-plan.md`](docs/implementation-plan.md))
 - Contributor/agent guide: [`CLAUDE.md`](CLAUDE.md)
-- Status: Phase 0 (editorial foundation) mostly done; Phase 1 (Python reference pipeline) done; **next: Phase 2, shared classification rules.** Web hosting is a future milestone. See [`docs/decision-log.md`](docs/decision-log.md).
+- Status: Phases 0 to 2 done (editorial foundation, Python reference pipeline, shared classification rules; Phase 2 partially met, see [`docs/evaluation-report.md`](docs/evaluation-report.md)). **Next: Phase 3, Flutter app foundation.** Web hosting is a future milestone. See [`docs/decision-log.md`](docs/decision-log.md).
 
 ## Layout
 ```
 app/                       Flutter app (Android first). Created in Phase 3
-rules/                     Classification rules (rules.json from Phase 2)
+rules/                     Classification rules, golden cases, baseline metrics
 docs/                      Product, architecture, policy, plan, decisions
 data/                      Labeled seed data
 tools/pipeline-prototype/  Python/Django reference pipeline (not deployed)

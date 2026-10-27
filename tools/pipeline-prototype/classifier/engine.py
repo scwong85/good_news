@@ -29,6 +29,7 @@ class Item:
     published_at: datetime | None = None
     source_trust: float = 0.5
     source_tier: int = 1
+    language: str | None = None  # None = unknown (skip the language check)
 
     @property
     def text(self) -> str:
@@ -114,6 +115,9 @@ def _stage1(item: Item, rules: dict, now: datetime | None) -> tuple[str, str] | 
         return ("excluded", "invalid_url")
     if not item.title.strip():
         return ("excluded", "missing_title")
+    allowed = rules.get("language_allowlist")
+    if allowed and item.language and item.language not in allowed:
+        return ("excluded", "unsupported_language")
     if item.published_at is None:
         return ("excluded", "missing_date")
     window = rules.get("age_window_days")
@@ -150,14 +154,21 @@ def classify(item: Item, rules: dict, now: datetime | None = None) -> Classifica
     explanation: list[dict] = []
     group_totals = {name: 0.0 for name in rules["groups"]}
     signals: list[str] = []
+    group_hits = {name: 0 for name in rules["groups"]}
     veto = False
     for rule in rules["score_rules"]:
         hit = _first_match(rule, item)
         if hit is None:
             continue
         group_totals[rule["group"]] += rule["weight"]
+        group_hits[rule["group"]] += 1
         explanation.append(
-            {"rule": rule["id"], "group": rule["group"], "weight": rule["weight"], "match": hit[:60]}
+            {
+                "rule": rule["id"],
+                "group": rule["group"],
+                "weight": rule["weight"],
+                "match": hit[:60],
+            }
         )
         if rule.get("signal") and rule["signal"] not in signals:
             signals.append(rule["signal"])
@@ -169,27 +180,39 @@ def classify(item: Item, rules: dict, now: datetime | None = None) -> Classifica
         if cap is not None:
             total = min(total, cap) if cap >= 0 else max(total, cap)
         score += total
-    prior = (item.source_trust - rules.get("trust_center", 0.5)) * rules.get("source_prior_scale", 0.2)
+    prior = (item.source_trust - rules.get("trust_center", 0.5)) * rules.get(
+        "source_prior_scale", 0.2
+    )
     if prior:
-        explanation.append({"rule": "source_prior", "group": "source", "weight": round(prior, 6), "match": item.source})
+        explanation.append(
+            {
+                "rule": "source_prior",
+                "group": "source",
+                "weight": round(prior, 6),
+                "match": item.source,
+            }
+        )
     score = round(max(0.0, min(1.0, score + prior)), 6)
 
     th = rules["thresholds"]
     need = rules.get("today_requires", {})
     has_evidence = len(signals) >= need.get("min_evidence_signals", 0)
     trusted = item.source_trust >= need.get("or_source_trust_at_least", 2.0)
+    has_vocab = all(group_hits.get(g, 0) >= n for g, n in need.get("min_group_matches", {}).items())
     reason = ""
-    if score >= th["today"] and not veto and (has_evidence or trusted):
+    if score >= th["today"] and not veto and has_vocab and (has_evidence or trusted):
         route = "today"
     elif score >= th["explore"]:
         route = "explore"
         if score >= th["today"]:
-            reason = "veto" if veto else "no_evidence"
+            reason = "veto" if veto else ("no_vocabulary" if not has_vocab else "no_evidence")
     else:
         route, reason = "excluded", "low_score"
 
     topics = _top_names(_keyword_matches(rules.get("topics", {}), item), rules.get("max_topics", 3))
-    types = _top_names(_keyword_matches(rules.get("story_types", {}), item), rules.get("max_story_types", 2))
+    types = _top_names(
+        _keyword_matches(rules.get("story_types", {}), item), rules.get("max_story_types", 2)
+    )
     if route != "excluded" and not types and rules.get("default_story_type"):
         types = [rules["default_story_type"]]
     return Classification(

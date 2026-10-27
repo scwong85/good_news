@@ -9,15 +9,16 @@ Remaining: human review of the draft labels; per-source terms review.
 ## Phase 1: Python reference pipeline (done, reference only)
 `tools/pipeline-prototype/`: RSS ingestion, canonicalization, normalization, idempotent storage, Django admin review queue, 66 tests. Kept as a reference and for the future web export.
 
-## Phase 2: Shared classification rules
+## Phase 2: Shared classification rules (done, partially met; see `evaluation-report.md`)
 **Objective:** a transparent, versioned rules file with measured accuracy, before any Dart code depends on it.
 Tasks:
-- Review/finalize labels; split into dev and held-out test sets (keep test untouched while tuning). Grow to >= 300 labeled items if feasible.
+- Review/finalize labels; split into dev and held-out test sets (keep test untouched while tuning). Grow to >= 300 labeled items if feasible. (Done: 290 draft labels in three splits; human review still pending.)
 - Define `rules/rules.json` (schema in `classification-rules.md`): lexicons, weights, thresholds, blocklists, per-source exclude patterns (for example roundups), topic and region rules, story-type rules.
 - Implement the reference classifier in Python (`tools/pipeline-prototype`) plus an evaluation script (precision/recall/F1 per story type, route accuracy).
 - Calibrate thresholds for `today` and `explore` routes.
 Deliverables: `rules/rules.json`, reference classifier, evaluation report, explanation output for every decision.
 Acceptance: on the held-out set, `today` route precision >= 85% and Tier-1 route accuracy >= 80%; every classification has an explanation; rules are deterministic.
+Result (rules 2026.11.2, blind `test2`): `today` precision 92.3% (met), Tier-1 route accuracy 73.3% (not met), explanations and determinism met. Labels are single-labeler drafts. The route-accuracy target is an open decision.
 
 ## Phase 3: Flutter app foundation (Android)
 Tasks: create the Flutter project in `app/` (Android target; keep code web-compatible); domain models; `StorySource` interface and `DirectRssStorySource`; HTTP client with timeouts, size cap, conditional GET, retry/backoff; RSS/Atom parsing; URL canonicalization and normalization (port of the Python behaviour); Drift schema; bundled source list generated from `source-allowlist.csv`.

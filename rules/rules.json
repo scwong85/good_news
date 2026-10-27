@@ -1,5 +1,5 @@
 {
- "rules_version": "2026.11.0",
+ "rules_version": "2026.11.2",
  "base_score": 0.3,
  "trust_center": 0.5,
  "source_prior_scale": 0.2,
@@ -9,11 +9,14 @@
  ],
  "thresholds": {
   "today": 0.5,
-  "explore": 0.4
+  "explore": 0.42
  },
  "today_requires": {
   "min_evidence_signals": 1,
-  "or_source_trust_at_least": 0.9
+  "or_source_trust_at_least": 0.9,
+  "min_group_matches": {
+   "positive": 1
+  }
  },
  "groups": {
   "positive": {
@@ -357,7 +360,7 @@
    "id": "sig_data",
    "group": "evidence",
    "field": "text",
-   "regex": "\\$\\s?\\d|\\b\\d[\\d,.]*\\s?(%|percent|hectares?|acres?|million|billion|tons?|tonnes|households?|species|countries|degrees?|mayors|kilometres|kilometers|km)\\b|\\b\\d{2,3},\\d{3}\\b",
+   "regex": "\\$\\s?\\d|\\b\\d[\\d,.]*\\s?%|\\b\\d[\\d,.]*\\s?(percent|hectares?|acres?|million|billion|tons?|tonnes|households?|species|countries|degrees?|mayors|kilometres|kilometers|km)\\b|\\b\\d{2,3},\\d{3}\\b",
    "weight": 0.1,
    "signal": "data_cited"
   },

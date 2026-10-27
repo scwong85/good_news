@@ -37,14 +37,38 @@ def evaluate(pairs: list[tuple[dict, "object"]], tier1_sources: set[str]) -> dic
         p, r, f = prf(tp, fp, fn)
         out[name] = {"predicted": tp + fp, "precision": p, "recall": r, "f1": f}
     types: dict[str, dict] = {}
-    names = sorted({t for g, _ in pairs for t in g["story_types"]} | {t for _, c in pairs for t in c.story_types})
+    names = sorted(
+        {t for g, _ in pairs for t in g["story_types"]}
+        | {t for _, c in pairs for t in c.story_types}
+    )
     for t in names:
-        tp = sum(1 for g, c in pairs if gold_pos(g) and shown(c) and t in g["story_types"] and t in c.story_types)
-        fp = sum(1 for g, c in pairs if shown(c) and t in c.story_types and not (gold_pos(g) and t in g["story_types"]))
-        fn = sum(1 for g, c in pairs if gold_pos(g) and t in g["story_types"] and not (shown(c) and t in c.story_types))
+        tp = sum(
+            1
+            for g, c in pairs
+            if gold_pos(g) and shown(c) and t in g["story_types"] and t in c.story_types
+        )
+        fp = sum(
+            1
+            for g, c in pairs
+            if shown(c) and t in c.story_types and not (gold_pos(g) and t in g["story_types"])
+        )
+        fn = sum(
+            1
+            for g, c in pairs
+            if gold_pos(g) and t in g["story_types"] and not (shown(c) and t in c.story_types)
+        )
         p, r, f = prf(tp, fp, fn)
-        types[t] = {"precision": p, "recall": r, "f1": f, "support": sum(1 for g, _ in pairs if gold_pos(g) and t in g["story_types"])}
+        types[t] = {
+            "precision": p,
+            "recall": r,
+            "f1": f,
+            "support": sum(1 for g, _ in pairs if gold_pos(g) and t in g["story_types"]),
+        }
     out["story_types"] = types
-    out["missed_by_reason"] = dict(Counter(c.reason or "-" for g, c in pairs if gold_pos(g) and not shown(c)))
-    out["false_pos_by_reason"] = dict(Counter(g["rejection_reason"] or "-" for g, c in pairs if shown(c) and not gold_pos(g)))
+    out["missed_by_reason"] = dict(
+        Counter(c.reason or "-" for g, c in pairs if gold_pos(g) and not shown(c))
+    )
+    out["false_pos_by_reason"] = dict(
+        Counter(g["rejection_reason"] or "-" for g, c in pairs if shown(c) and not gold_pos(g))
+    )
     return out
