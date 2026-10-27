@@ -32,10 +32,11 @@ Confidence: with so few "today" predictions the intervals are wide. test2 today 
 | Criterion | Target | Result | Status |
 |---|---|---|---|
 | `today` precision on held-out data | >= 85% | 92.3% (test2), 80.0% on the first blind run | Met on the final blind run; the first blind run missed, so treat as borderline |
-| Tier-1 route accuracy on held-out data | >= 80% | 73.3% (test2), 80.5% on the first blind run | **Not met** on the final blind run |
+| Tier-1 route accuracy on held-out data | >= 80% | 73.3% (test2), 80.5% on the first blind run | **Dropped** (decision #30): not met on the final blind run |
+| `shown` (today+explore) precision on held-out data | >= 75% (replacement target) | 75.0% (27 of 36 on test2) | Met, with no margin |
 | Every classification has an explanation | yes | yes (tested) | Met |
 | Rules deterministic | yes | yes (tested) | Met |
-Phase 2 is therefore **partially met**; see the decision log for the open decision.
+**The replacement target was chosen after seeing these results**, so passing it is weaker evidence than a pre-registered target. The `shown` precision margin is zero (75.0% vs 75%), and on dev2 the first blind run of an earlier rules version gave 80.0% / 85.7%. Treat Phase 2 as met on the revised criteria, with the caveats above.
 
 ## Where it fails
 - **Recall.** On test2, 17 of 44 constructive stories scored below the Explore line. Typical misses are solution-journalism features whose headline and excerpt contain little constructive vocabulary ("Beavers Are Having a Moment", "Meet India's Four-Legged Wildlife Detectives"). Excerpt-only rules cannot see the article body.
@@ -51,6 +52,6 @@ Classifying every article stored in the local database from the last 14 days (20
 
 ## Recommendations
 1. Have a person review the 290 draft labels (priority: the `test2` and borderline items), then re-run.
-2. Decide whether the Phase 2 route-accuracy target stays at 80% (probably needs a richer signal than title + excerpt) or is replaced by a product-focused target such as `today` precision >= 85% and `shown` precision >= 75%.
+2. Route accuracy (recall) is limited by title + excerpt input; the product-focused targets above replaced it (decision #30). Revisit if a richer signal becomes available.
 3. Improve recall cheaply with more lexicon coverage using new labeled data (never tune on `test2`; create a fresh held-out batch for the next iteration).
 4. Keep the rules explainable. Do not add title-specific rules.

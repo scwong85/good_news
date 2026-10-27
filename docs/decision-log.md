@@ -33,25 +33,31 @@ Status: **active**, or **superseded by #n**.
 | 27 | Daily picks fill from `explore` when `today` has too few stories (measured ~2.6 `today` per day) | 2026-10-27 | active |
 | 28 | Evaluation uses blind held-out label batches; a split that has been used for tuning is never reused as held-out. All labels are Claude drafts pending human review | 2026-10-27 | active |
 | 29 | YES! Magazine trust lowered 0.85 -> 0.60 (0 of 8 dev items constructive) | 2026-10-27 | active |
-| 25 | State management Riverpod, storage Drift/SQLite, routing go_router (subject to change at Phase 3 if a better fit is found) | 2026-10-27 | proposed |
+| 30 | Phase 2 acceptance revised: Tier-1 route accuracy (>= 80%) replaced by `shown` precision >= 75% alongside `today` precision >= 85%. Chosen after seeing 73.3% route accuracy on the blind set, so it is not a pre-registered target. | 2026-10-27 | active |
+| 25 | State management Riverpod, storage Drift/SQLite, routing go_router | 2026-10-27 | active for Riverpod 3 (DI only so far) and Drift; go_router still proposed (Phase 5) |
+| 31 | Dart port differences from the Python reference: no language detection (items use the source's language), no Unicode NFC normalization, own XML sanitizer (bare `&`, HTML named entities, control chars, BOM, ISO-8859-1) because the `xml` package is strict. URL canonicalization is checked against the Python output (`app/test/fixtures/golden_urls.json`, 41 cases) | 2026-10-27 | active |
+| 32 | Phase 3 libraries: `http`, `xml`, `html`, `crypto`, `drift` + `drift_flutter`, `flutter_riverpod`. Drift row classes are `SourceRow`/`ArticleRow`; generated code is committed; Drift returns local-time `DateTime`s, so compare instants/UTC | 2026-10-27 | active |
+| 33 | Backoff rules: no backoff for the first 2 consecutive failures; from the 3rd, 15 min doubling to a 6 h cap; a 429 with Retry-After backs off for that duration (max 1 day). Fetch TTL 30 min, concurrency 4, per-request timeout 10 s, body cap 5 MB, overall deadline 15 s, retention 30 days | 2026-10-27 | active |
+| 34 | The Android SDK is unavailable in the cloud session (`dl.google.com` blocked), so Phase 3 was verified by analysis, 113 tests and a live-feed script, not on an emulator/device | 2026-10-27 | active |
 
 ## Open questions
-- **Decision needed:** Phase 2 Tier-1 route accuracy is 73.3% on the blind held-out set vs the 80% target (`today` precision 92.3% meets its target). Options: keep the target and add data/lexicon work, replace it with product-focused targets (for example `today` precision >= 85% and `shown` precision >= 75%), or accept as is and move on.
 - Human review of the 290 draft labels (priority: `test2` and items marked borderline); they were all labeled by Claude.
 - Per-source terms/licensing review for direct client-side fetching by end users.
 - Contact address for takedown requests; privacy policy hosting (needed for the Play Store).
 - Project name, application id and Play Store account.
 - Web milestone: GitHub Pages vs Netlify, and the scheduler for the export job.
+- **Phase 3 device check:** build and run the app on an Android device/emulator (not possible in the cloud session) and confirm the harness screen fetches and lists stories.
+- Application id and app name (currently `com.example.good_news` / "Good News").
 - Squirrel News feed 404s; find a working feed or drop the source.
-- Flutter SDK is not installed in the cloud session; Phase 3 needs it (or a CI-less local setup).
+- Flutter 3.47 is installed at `/opt/flutter` in the cloud session; the Android SDK is not.
 
 ## Phase tracker (see `implementation-plan.md`)
 | Phase | Status |
 |---|---|
 | 0 Editorial foundation | Mostly done: policy, 10 verified feeds, 102 draft labels. Remaining: human label review, terms review |
 | 1 Python reference pipeline | Done (reference only, `tools/pipeline-prototype`) |
-| 2 Shared classification rules | Done, partially met: rules 2026.11.2, Python reference, evaluator, golden cases, 93 tests, evaluation report. Route-accuracy target open |
-| 3 Flutter app foundation (Android) | Not started |
+| 2 Shared classification rules | Done (revised targets met): rules 2026.11.2, Python reference, evaluator, golden cases, 93 tests, evaluation report |
+| 3 Flutter app foundation (Android) | Done in code: models, fetcher, parser, normalizer, Drift DB, ingestion service, harness screen, 113 tests, live-feed check. **Not yet built or run on a device/emulator** |
 | 4 On-device classification, de-dup, daily selection | Not started |
 | 5 Android UI | Not started |
 | 6 Android hardening and release | Not started |

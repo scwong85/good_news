@@ -23,5 +23,5 @@ Calm, trustworthy app that gives a small daily briefing (5-10 stories, user sett
 - Follow the phase order in `docs/implementation-plan.md`; update the tracker, decisions and open questions in `docs/decision-log.md`.
 - Skills in `.claude/skills/` cover each area (`flutter-app`, `rss-ingestion`, `rule-based-classification`, `deduplication`, `privacy-and-content-licensing`, `evaluation-and-test-writing`, `pipeline-prototype`; `static-feed-export`, `local-embeddings`, `llm-enrichment` are future).
 - A Stop hook runs `scripts/dev-check.sh` (rules sync check, `flutter analyze/test` once `app/` exists; set `DEV_CHECK_PROTOTYPE=1` to include the Python prototype, which needs Postgres).
-- Commands: app `cd app && flutter test`; prototype `cd tools/pipeline-prototype && uv run pytest`; rules sync `scripts/sync-rules.sh`.
+- Commands (Flutter is at `/opt/flutter/bin`): app `cd app && flutter analyze && flutter test`; prototype `cd tools/pipeline-prototype && uv run pytest`; rules sync `scripts/sync-rules.sh`.
 - Tests never hit the live network; use fixture feeds.

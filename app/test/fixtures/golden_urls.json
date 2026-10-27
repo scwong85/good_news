@@ -1,0 +1,166 @@
+[
+ {
+  "input": "https://Example.com/a/b/?utm_source=x&id=2&fbclid=z#frag",
+  "expected": "https://example.com/a/b?id=2"
+ },
+ {
+  "input": "http://example.com/story",
+  "expected": "https://example.com/story"
+ },
+ {
+  "input": "https://example.com:443/story/",
+  "expected": "https://example.com/story"
+ },
+ {
+  "input": "https://example.com",
+  "expected": "https://example.com/"
+ },
+ {
+  "input": "https://example.com/?b=2&a=1",
+  "expected": "https://example.com/?a=1&b=2"
+ },
+ {
+  "input": "https://example.com:8443/x",
+  "expected": "https://example.com:8443/x"
+ },
+ {
+  "input": "  https://example.com/x?mc_cid=1&mc_eid=2  ",
+  "expected": "https://example.com/x"
+ },
+ {
+  "input": "HTTP://EXAMPLE.COM/Path/To/Page/",
+  "expected": "https://example.com/Path/To/Page"
+ },
+ {
+  "input": "https://example.com/a//b///",
+  "expected": "https://example.com/a//b"
+ },
+ {
+  "input": "https://example.com////",
+  "expected": "https://example.com/"
+ },
+ {
+  "input": "https://example.com./x",
+  "expected": "https://example.com/x"
+ },
+ {
+  "input": "https://user:pw@example.com/x",
+  "expected": "https://example.com/x"
+ },
+ {
+  "input": "https://example.com:80/x",
+  "expected": "https://example.com/x"
+ },
+ {
+  "input": "https://example.com/x?a=1&a=2&a=0",
+  "expected": "https://example.com/x?a=0&a=1&a=2"
+ },
+ {
+  "input": "https://example.com/x?flag&b=&=v",
+  "expected": "https://example.com/x?=v&b=&flag="
+ },
+ {
+  "input": "https://example.com/x?q=hello+world&r=a%20b",
+  "expected": "https://example.com/x?q=hello+world&r=a+b"
+ },
+ {
+  "input": "https://example.com/x?q=caf%C3%A9&r=%E2%9C%93",
+  "expected": "https://example.com/x?q=caf%C3%A9&r=%E2%9C%93"
+ },
+ {
+  "input": "https://example.com/x?q=100%25&bad=%zz&trail=%",
+  "expected": "https://example.com/x?bad=%25zz&q=100%25&trail=%25"
+ },
+ {
+  "input": "https://example.com/x?name=Zoë&city=München",
+  "expected": "https://example.com/x?city=M%C3%BCnchen&name=Zo%C3%AB"
+ },
+ {
+  "input": "https://example.com/x?emoji=😀",
+  "expected": "https://example.com/x?emoji=%F0%9F%98%80"
+ },
+ {
+  "input": "https://example.com/x?UTM_Source=a&Fbclid=b&keep=1",
+  "expected": "https://example.com/x?keep=1"
+ },
+ {
+  "input": "https://example.com/x?pk_campaign=a&hsa_acc=b&vero_id=c&utm_term=d&z=1",
+  "expected": "https://example.com/x?z=1"
+ },
+ {
+  "input": "https://example.com/x?ref=home&source=nl",
+  "expected": "https://example.com/x?ref=home&source=nl"
+ },
+ {
+  "input": "https://example.com/x?a=1&&b=2&",
+  "expected": "https://example.com/x?a=1&b=2"
+ },
+ {
+  "input": "https://example.com/x#only-fragment",
+  "expected": "https://example.com/x"
+ },
+ {
+  "input": "https://example.com/p%C3%A4th/%7Euser",
+  "expected": "https://example.com/p%C3%A4th/%7Euser"
+ },
+ {
+  "input": "https://m.example.com/wp/2026/10/story-title/?amp=1",
+  "expected": "https://m.example.com/wp/2026/10/story-title?amp=1"
+ },
+ {
+  "input": "https://news.example.co.uk/a-b_c.d/e?x=~tilde",
+  "expected": "https://news.example.co.uk/a-b_c.d/e?x=~tilde"
+ },
+ {
+  "input": "https://example.com?x=1",
+  "expected": "https://example.com/?x=1"
+ },
+ {
+  "input": "https://example.com#frag",
+  "expected": "https://example.com/"
+ },
+ {
+  "input": "",
+  "expected": null
+ },
+ {
+  "input": "ftp://example.com/x",
+  "expected": null
+ },
+ {
+  "input": "javascript:alert(1)",
+  "expected": null
+ },
+ {
+  "input": "/relative/path",
+  "expected": null
+ },
+ {
+  "input": "mailto:a@b.c",
+  "expected": null
+ },
+ {
+  "input": "https://",
+  "expected": null
+ },
+ {
+  "input": "https:///nohost",
+  "expected": null
+ },
+ {
+  "input": "https://example.com:notaport/x",
+  "expected": null
+ },
+ {
+  "input": "https://example.com:99999/x",
+  "expected": null
+ },
+ {
+  "input": "example.com/no-scheme",
+  "expected": null
+ },
+ {
+  "input": "//example.com/protocol-relative",
+  "expected": null
+ }
+]

@@ -38,7 +38,10 @@ def canonicalize_url(url: str) -> str:
     if parts.scheme.lower() not in {"http", "https"} or not parts.hostname:
         raise InvalidURL(f"unsupported URL: {url!r}")
     host = parts.hostname.lower().rstrip(".")
-    port = parts.port
+    try:
+        port = parts.port
+    except ValueError:
+        raise InvalidURL(f"invalid port: {url!r}") from None
     netloc = host if port in (None, 80, 443) else f"{host}:{port}"
     query = [
         (k, v)

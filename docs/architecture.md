@@ -31,7 +31,8 @@ Tested 2026-10-27: 1 of 10 active feeds sends CORS headers (Mongabay). The other
 | `pipeline/` | Pure Dart: `normalize`, `canonicalize_url`, `filters`, `dedupe`, `classify`, `rank`, `select` (no Flutter imports, fully unit-testable) |
 | `rules/` | Loads `rules.json` (bundled asset; remote updates are a future milestone) |
 | `features/` | `today`, `explore`, `story`, `saved`, `preferences` (UI + state) |
-| `core/` | HTTP client, clock, config, logging |
+| `core/` | Riverpod providers, asset loading, clock, config |
+| `ingestion/` | `IngestionService` (parallel refresh, TTL, backoff, retention) |
 
 ### StorySource contract
 ```dart

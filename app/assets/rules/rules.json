@@ -1,0 +1,401 @@
+{
+ "rules_version": "2026.11.2",
+ "base_score": 0.3,
+ "trust_center": 0.5,
+ "source_prior_scale": 0.2,
+ "age_window_days": 14,
+ "language_allowlist": [
+  "en"
+ ],
+ "thresholds": {
+  "today": 0.5,
+  "explore": 0.42
+ },
+ "today_requires": {
+  "min_evidence_signals": 1,
+  "or_source_trust_at_least": 0.9,
+  "min_group_matches": {
+   "positive": 1
+  }
+ },
+ "groups": {
+  "positive": {
+   "cap": 0.4
+  },
+  "negative": {
+   "cap": -0.6
+  },
+  "evidence": {
+   "cap": 0.25
+  }
+ },
+ "max_topics": 3,
+ "max_story_types": 2,
+ "default_story_type": "human_interest",
+ "stage1": {
+  "blocked_domains": [],
+  "global_excludes": [
+   {
+    "id": "roundup_good_news",
+    "field": "title",
+    "regex": "^Good News (This Week|in History)",
+    "reason": "too_trivial"
+   },
+   {
+    "id": "roundup_went_right",
+    "field": "title",
+    "regex": "^What went right this week",
+    "reason": "too_trivial"
+   },
+   {
+    "id": "reading_list",
+    "field": "title",
+    "regex": "^What We.re Reading",
+    "reason": "promotional"
+   },
+   {
+    "id": "podcast_transcript",
+    "field": "title",
+    "regex": "^Podcast Transcript",
+    "reason": "too_trivial"
+   },
+   {
+    "id": "photo_gallery",
+    "field": "title",
+    "regex": "(photographer of the year|winning images)",
+    "reason": "too_trivial"
+   },
+   {
+    "id": "magazine_promo",
+    "field": "title",
+    "regex": "new issue of Positive News magazine",
+    "reason": "promotional"
+   },
+   {
+    "id": "sponsored_url",
+    "field": "url",
+    "regex": "/(sponsored|partner-content|advertorial)/",
+    "reason": "promotional"
+   }
+  ],
+  "source_excludes": {
+   "YES! Magazine": [
+    {
+     "id": "yes_inspiration_column",
+     "field": "title",
+     "regex": "^Inspiration",
+     "reason": "too_trivial"
+    }
+   ]
+  }
+ },
+ "topics": {
+  "environment": [
+   "\\b(wildlife|conservation|restor\\w+|reef|forest|rewild\\w*|biodiversity|climate|solar|renewable|ocean|species|rainforest|wetland|nature|ecosystem|pollution|recycl\\w+|compost\\w*|emissions?|habitat)\\b"
+  ],
+  "science": [
+   "\\b(scientists?|researchers?|study|studies|discover\\w*|laborator\\w+|experiment\\w*)\\b"
+  ],
+  "health": [
+   "\\b(health|medical|medicine|disease|cancer|patients?|hospital|hospice|dengue|mental|drug|vaccine|treatment|clinic|blindness|alzheimer\\w*)\\b"
+  ],
+  "education": [
+   "\\b(school|students?|teachers?|learn\\w*|college|universit\\w+|education|training|academy|skills)\\b"
+  ],
+  "technology": [
+   "\\b(app|technology|battery|electric|robot\\w*|digital|3d-printed|invention|device|ai)\\b"
+  ],
+  "community": [
+   "\\b(volunteers?|community|neighbou?rs?|mutual aid|charity|donat\\w+|fundrais\\w+|local)\\b"
+  ],
+  "development": [
+   "\\b(poverty|farmers?|housing|jobs?|income|development|livelihoods?|rural)\\b"
+  ],
+  "society": [
+   "\\b(reform|law|policy|justice|prison|incarcerat\\w+|rights|equality|inclusion|crime)\\b"
+  ],
+  "culture": [
+   "\\b(music|art|museum|film|book|opera|festival|language)\\b"
+  ]
+ },
+ "story_types": {
+  "progress": [
+   "\\b(progress|reform|recover\\w*|improv\\w+|historic|record|plummet\\w*|reduc\\w+|decline|repeal\\w*|victory|wins?)\\b"
+  ],
+  "solution": [
+   "\\b(solutions?|approach|model|program(me)?|initiative|pilot|helping|tool|working to|framework|new method)\\b"
+  ],
+  "community": [
+   "\\b(volunteers?|community|neighbou?rs?|mutual aid|local|students? (help|spend)\\w*)\\b"
+  ],
+  "science_health": [
+   "\\b(study|researchers?|scientists?|trial|treatment|drug|vaccine|medical|clinic|dengue|eye drops)\\b"
+  ],
+  "environment": [
+   "\\b(wildlife|conservation|restor\\w+|reef|forest|rewild\\w*|biodiversity|climate|solar|renewable|ocean|species|wetland|habitat)\\b"
+  ],
+  "education_opportunity": [
+   "\\b(school|students?|education|training|academy|skills|careers?|jobs?|inclusion|deaf|teenagers?)\\b"
+  ],
+  "human_interest": [
+   "\\b(resilien\\w+|kindness|achievement|inspir\\w+)\\b"
+  ],
+  "technology_for_good": [
+   "\\b(app|battery|3d-printed|invention|device|electric (ferry|bus)|technology)\\b"
+  ]
+ },
+ "score_rules": [
+  {
+   "id": "progress_terms",
+   "group": "positive",
+   "field": "text",
+   "regex": "\\b(breakthrough|recover(y|ed|ing)?|restor(e|ed|es|ing|ation)|revive[sd]?|rewild\\w*|reforest\\w*|regenerat\\w*|reintroduc\\w+)\\b",
+   "weight": 0.1
+  },
+  {
+   "id": "reduce_terms",
+   "group": "positive",
+   "field": "text",
+   "regex": "\\b(reduc(e|ed|es|ing|tion)|lower(ed)?|cut(s|ting)? (emissions|pollution|waste)|declin(e|ed|ing) in|plummet\\w*|drop(ped)? in)\\b",
+   "weight": 0.08
+  },
+  {
+   "id": "protect_terms",
+   "group": "positive",
+   "field": "text",
+   "regex": "\\b(protect(ed|ion|ing)?|conserv(e|ation|ing)|safeguard\\w*|preserv(e|ed|ation))\\b",
+   "weight": 0.08
+  },
+  {
+   "id": "action_terms",
+   "group": "positive",
+   "field": "text",
+   "regex": "\\b(launch(ed|es)?|develop(ed|s)?|expand(ed|s|ing)?|approved|adopt(ed|s)?|pledge[sd]?|invest(s|ed|ment)?|fund(s|ed|ing)?)\\b",
+   "weight": 0.06
+  },
+  {
+   "id": "collab_terms",
+   "group": "positive",
+   "field": "text",
+   "regex": "\\b(partnership|collaborat\\w+|volunteers?|community[- ]led|unites?|coalition|mutual aid)\\b",
+   "weight": 0.08
+  },
+  {
+   "id": "solution_terms",
+   "group": "positive",
+   "field": "text",
+   "regex": "\\b(solutions?|approach|model|program(me)?|initiative|pilot|scheme|framework|tool)\\b",
+   "weight": 0.06
+  },
+  {
+   "id": "success_terms",
+   "group": "positive",
+   "field": "text",
+   "regex": "\\b(success(ful(ly)?)?|historic|first[- ]of[- ]its[- ]kind|world[- ]first|first ever|award(ed)?|wins?|won|thriv\\w+)\\b",
+   "weight": 0.07
+  },
+  {
+   "id": "clean_energy",
+   "group": "positive",
+   "field": "text",
+   "regex": "\\b(solar|wind (farm|power|turbine)|renewable\\w*|clean energy|geothermal|battery[- ]electric|electric (ferry|bus|vehicle)s?)\\b",
+   "weight": 0.07
+  },
+  {
+   "id": "people_help",
+   "group": "positive",
+   "field": "text",
+   "regex": "\\b(helping|helps|help(ed)? (people|others|families|children|students|communities)|new approach|working to)\\b",
+   "weight": 0.06
+  },
+  {
+   "id": "revival_terms",
+   "group": "positive",
+   "field": "text",
+   "regex": "\\b(bring(s|ing)? back|comeback|return(s|ed)? to the wild|releas(e|ed|ing) (to|into) the wild|nearly (disappeared|extinct)|back from)\\b",
+   "weight": 0.1
+  },
+  {
+   "id": "transform_terms",
+   "group": "positive",
+   "field": "text",
+   "regex": "\\b(transform(s|ed|ing)?|turning .{1,40} into|repurpos\\w+|reus(e|ed|ing)|upcycl\\w+|circular)\\b",
+   "weight": 0.07
+  },
+  {
+   "id": "tackle_terms",
+   "group": "positive",
+   "field": "text",
+   "regex": "\\b(tackl(e|es|ed|ing)|combat\\w*|prevent\\w*|address(es|ing)?|crackdown|first step|step toward)\\b",
+   "weight": 0.07
+  },
+  {
+   "id": "access_terms",
+   "group": "positive",
+   "field": "text",
+   "regex": "\\b(free|affordable|accessible|opens?|opened|stock(s|ing)|offers?)\\b",
+   "weight": 0.05
+  },
+  {
+   "id": "innovation_terms",
+   "group": "positive",
+   "field": "text",
+   "regex": "\\b(revolutionary|innovati\\w+|invent(s|ed|ion|or)?)\\b",
+   "weight": 0.06
+  },
+  {
+   "id": "bridge_terms",
+   "group": "positive",
+   "field": "text",
+   "regex": "\\b(uniting|bridg\\w+|common ground|bringing (people )?together|together)\\b",
+   "weight": 0.07
+  },
+  {
+   "id": "harm_terms",
+   "group": "negative",
+   "field": "text",
+   "regex": "\\b(attack(s|ed)?|war|wars|kill(s|ed|ing)?|murder\\w*|genocide|terror\\w*|crisis|scandal|fraud|lawsuit|collapse[sd]?|abus(e|ed|es)|trafficking|threat(s|en|ened|ening)?|toxic|dried up|choking|gasp\\w*|mourns?|death|dies|died)\\b",
+   "weight": -0.12
+  },
+  {
+   "id": "harm_title",
+   "group": "negative",
+   "field": "title",
+   "regex": "\\b(attack(s|ed)?|war|wars|kill(s|ed|ing)?|genocide|scandal|fraud|lawsuit|mourns?|death|election|smoke|toxic|boycott\\w*|cuts?)\\b",
+   "weight": -0.18,
+   "veto": true
+  },
+  {
+   "id": "obstacle_terms",
+   "group": "negative",
+   "field": "text",
+   "regex": "\\b(steep climb|despite|dispute|conflict|denial\\w*|far[- ]right|blind spot|under strain|struggl\\w+|fight to)\\b",
+   "weight": -0.1
+  },
+  {
+   "id": "opinion",
+   "group": "negative",
+   "field": "text",
+   "regex": "\\((commentary|opinion|analysis)\\)|\\b(op-ed|essay|my father|i told my)\\b",
+   "weight": -0.3
+  },
+  {
+   "id": "advocacy",
+   "group": "negative",
+   "field": "text",
+   "regex": "\\b(abolish|demand justice|liberation|resistance|activists? (aim|want)|empire|capitalism|fascis\\w+|colonial\\w*)\\b",
+   "weight": -0.2
+  },
+  {
+   "id": "listicle",
+   "group": "negative",
+   "field": "title",
+   "regex": "^\\d+ (things|ways|tips|swaps|reasons|signs|ideas)\\b|^\\d+ ",
+   "weight": -0.25
+  },
+  {
+   "id": "how_to",
+   "group": "negative",
+   "field": "title",
+   "regex": "\\b(how to|where to|here.s what|what to (watch|expect)|tips?|guide|should you)\\b|\\bwhat (it|this|the new)\\b.* mean",
+   "weight": -0.22
+  },
+  {
+   "id": "advice_voice",
+   "group": "negative",
+   "field": "text",
+   "regex": "\\byou(r)? (can|should|need|might)\\b|\\bmagic.? phrases\\b|\\binstantly\\b",
+   "weight": -0.12
+  },
+  {
+   "id": "question_title",
+   "group": "negative",
+   "field": "title",
+   "regex": "\\?\\s*$",
+   "weight": -0.08
+  },
+  {
+   "id": "clickbait",
+   "group": "negative",
+   "field": "text",
+   "regex": "\\b(viral|tiktok|masterclass|goldmine|you won.t believe|shocked)\\b|\\bmagic\\b",
+   "weight": -0.14
+  },
+  {
+   "id": "promo_terms",
+   "group": "negative",
+   "field": "text",
+   "regex": "\\b(sponsored|discount|deal|buy|insurance|remodel\\w*|budget(ing)?|margins?|home improvements?|psychiatrist|rent)\\b",
+   "weight": -0.25
+  },
+  {
+   "id": "animal_anecdote",
+   "group": "negative",
+   "field": "text",
+   "regex": "\\b(baby|calf|orphan\\w*|rescued|adopted|emaciated|mauled|zebras?)\\b.*\\b(elephant|rhino|calf|cub|puppy|dog|cat|horse|zoo|otter|lion)s?\\b|\\b(elephant|calf|puppy|kitten|otter)\\b.*\\b(rescued|rescue|adopted|mauled|scars)\\b",
+   "weight": -0.2
+  },
+  {
+   "id": "age_milestone",
+   "group": "negative",
+   "field": "title",
+   "regex": "\\b(oldest (man|woman|person)|years? young|turns? \\d+|celebrates? \\d+)\\b",
+   "weight": -0.25
+  },
+  {
+   "id": "celebrity_history",
+   "group": "negative",
+   "field": "text",
+   "regex": "\\b(in \\d{4},|\\d+ years ago|johnny carson|bowie|crosby|retirement)\\b",
+   "weight": -0.15
+  },
+  {
+   "id": "quirky",
+   "group": "negative",
+   "field": "title",
+   "regex": "\\b(quits?|piano|equine braille|dressage|personality test|shanty|rap group|archetype)\\b",
+   "weight": -0.15
+  },
+  {
+   "id": "sig_data",
+   "group": "evidence",
+   "field": "text",
+   "regex": "\\$\\s?\\d|\\b\\d[\\d,.]*\\s?%|\\b\\d[\\d,.]*\\s?(percent|hectares?|acres?|million|billion|tons?|tonnes|households?|species|countries|degrees?|mayors|kilometres|kilometers|km)\\b|\\b\\d{2,3},\\d{3}\\b",
+   "weight": 0.1,
+   "signal": "data_cited"
+  },
+  {
+   "id": "sig_study",
+   "group": "evidence",
+   "field": "text",
+   "regex": "\\b(study|studies|researchers?|scientists?|trial|peer[- ]reviewed|journal|findings?)\\b",
+   "weight": 0.08,
+   "signal": "study_referenced"
+  },
+  {
+   "id": "sig_institution",
+   "group": "evidence",
+   "field": "text",
+   "regex": "\\b(universit(y|ies)|institute|hospital|foundation|commission|council|ministry|department|agency|nasa|unicef|wwf|wwt|ngo)\\b|\\b(UN|EU|WHO|FDA)\\b|Trust\\b",
+   "weight": 0.08,
+   "signal": "named_institution",
+   "flags": ""
+  },
+  {
+   "id": "sig_official",
+   "group": "evidence",
+   "field": "text",
+   "regex": "\\b(government|parliament|minister|legislation|regulation|policy|law|ban|repeal\\w*|bill)\\b",
+   "weight": 0.05,
+   "signal": "official_source"
+  },
+  {
+   "id": "sig_outcome",
+   "group": "evidence",
+   "field": "text",
+   "regex": "\\b\\d+(\\.\\d+)?\\s?(%|percent|times|fold)|\\b(lower|higher) odds\\b|\\bstriking results\\b|\\bplummeting\\b|\\bsurg(e|ed|ing)\\b",
+   "weight": 0.08,
+   "signal": "measurable_outcome"
+  }
+ ]
+}

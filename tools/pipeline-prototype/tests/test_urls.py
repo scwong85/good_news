@@ -23,7 +23,15 @@ def test_canonicalize(raw, expected):
 
 
 @pytest.mark.parametrize(
-    "raw", ["", "ftp://example.com/x", "javascript:alert(1)", "/relative/path", "mailto:a@b.c"]
+    "raw",
+    [
+        "",
+        "ftp://example.com/x",
+        "javascript:alert(1)",
+        "/relative/path",
+        "mailto:a@b.c",
+        "https://example.com:notaport/x",
+    ],
 )
 def test_rejects_non_http(raw):
     with pytest.raises(InvalidURL):

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>Sloppy Feed</title>
+<item>
+<title>Fish &amp; chips&nbsp;cheaper &mdash; and Tom & Jerry return</title>
+<link>https://example.com/sloppy?a=1&b=2</link>
+<pubDate>Tue, 27 Oct 2026 07:00:17 GMT</pubDate>
+<description>Control char here: bell and a &unknownentity; stays text.</description>
+</item>
+</channel></rss>

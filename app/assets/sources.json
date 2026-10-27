@@ -1,0 +1,125 @@
+{
+ "generated_from": "docs/source-allowlist.csv",
+ "sources": [
+  {
+   "id": "positive-news",
+   "name": "Positive News",
+   "homepage_url": "https://www.positive.news",
+   "rss_url": "https://www.positive.news/feed/",
+   "tier": 1,
+   "trust_score": 0.95,
+   "language": "en",
+   "regions": [
+    "global"
+   ]
+  },
+  {
+   "id": "reasons-to-be-cheerful",
+   "name": "Reasons to be Cheerful",
+   "homepage_url": "https://reasonstobecheerful.world",
+   "rss_url": "https://reasonstobecheerful.world/feed/",
+   "tier": 1,
+   "trust_score": 0.92,
+   "language": "en",
+   "regions": [
+    "global"
+   ]
+  },
+  {
+   "id": "good-news-network",
+   "name": "Good News Network",
+   "homepage_url": "https://www.goodnewsnetwork.org",
+   "rss_url": "https://www.goodnewsnetwork.org/feed/",
+   "tier": 1,
+   "trust_score": 0.8,
+   "language": "en",
+   "regions": [
+    "global"
+   ]
+  },
+  {
+   "id": "the-optimist-daily",
+   "name": "The Optimist Daily",
+   "homepage_url": "https://www.optimistdaily.com",
+   "rss_url": "https://www.optimistdaily.com/feed/",
+   "tier": 1,
+   "trust_score": 0.85,
+   "language": "en",
+   "regions": [
+    "global"
+   ]
+  },
+  {
+   "id": "nice-news",
+   "name": "Nice News",
+   "homepage_url": "https://nicenews.com",
+   "rss_url": "https://nicenews.com/feed/",
+   "tier": 1,
+   "trust_score": 0.8,
+   "language": "en",
+   "regions": [
+    "global"
+   ]
+  },
+  {
+   "id": "good-good-good",
+   "name": "Good Good Good",
+   "homepage_url": "https://www.goodgoodgood.co",
+   "rss_url": "https://www.goodgoodgood.co/articles/rss.xml",
+   "tier": 1,
+   "trust_score": 0.85,
+   "language": "en",
+   "regions": [
+    "global"
+   ]
+  },
+  {
+   "id": "happy-eco-news",
+   "name": "Happy Eco News",
+   "homepage_url": "https://happyeconews.com",
+   "rss_url": "https://happyeconews.com/feed/",
+   "tier": 1,
+   "trust_score": 0.75,
+   "language": "en",
+   "regions": [
+    "global"
+   ]
+  },
+  {
+   "id": "upworthy",
+   "name": "Upworthy",
+   "homepage_url": "https://www.upworthy.com",
+   "rss_url": "https://www.upworthy.com/feed/",
+   "tier": 1,
+   "trust_score": 0.6,
+   "language": "en",
+   "regions": [
+    "global"
+   ]
+  },
+  {
+   "id": "yes-magazine",
+   "name": "YES! Magazine",
+   "homepage_url": "https://www.yesmagazine.org",
+   "rss_url": "https://www.yesmagazine.org/feed",
+   "tier": 1,
+   "trust_score": 0.6,
+   "language": "en",
+   "regions": [
+    "global"
+   ]
+  },
+  {
+   "id": "mongabay",
+   "name": "Mongabay",
+   "homepage_url": "https://news.mongabay.com",
+   "rss_url": "https://news.mongabay.com/feed/",
+   "tier": 2,
+   "trust_score": 0.85,
+   "language": "en",
+   "regions": [
+    "global"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>Example Positive</title>
+  <link>https://example.com</link>
+  <atom:link href="https://example.com/feed/" rel="self" type="application/rss+xml"/>
+  <description>Fixture feed modelled on a WordPress site</description>
+  <item>
+    <title>Wetlands restored by volunteers, study finds 40% more birds</title>
+    <link>https://example.com/wetlands/?utm_source=newsletter</link>
+    <guid isPermaLink="false">https://example.com/?p=101</guid>
+    <pubDate>Tue, 27 Oct 2026 07:00:17 +0000</pubDate>
+    <category><![CDATA[Environment]]></category>
+    <category><![CDATA[Climate]]></category>
+    <category><![CDATA[Weird Tag]]></category>
+    <description><![CDATA[<p>Volunteers restored 40 hectares of wetland &amp; counted the birds.</p> The post Wetlands restored by volunteers appeared first on Example Positive.]]></description>
+    <content:encoded><![CDATA[<p>FULL ARTICLE TEXT THAT MUST NEVER BE SHOWN IN THE APP.</p>]]></content:encoded>
+  </item>
+  <item>
+    <title><![CDATA[Clinic opens free care &#8211; for everyone]]></title>
+    <link>https://example.com/clinic/</link>
+    <guid isPermaLink="false">https://example.com/?p=102</guid>
+    <pubDate>27 Oct 2026 18:59:25 +0000</pubDate>
+    <description><![CDATA[Free care for families.]]></description>
+  </item>
+  <item>
+    <title>No date item</title>
+    <link>https://example.com/nodate</link>
+    <guid>g-nodate</guid>
+    <description>Skipped because there is no date.</description>
+  </item>
+  <item>
+    <title>Bad scheme item</title>
+    <link>ftp://example.com/file</link>
+    <guid>g-ftp</guid>
+    <pubDate>Tue, 27 Oct 2026 07:00:17 GMT</pubDate>
+  </item>
+  <item>
+    <title>   </title>
+    <link>https://example.com/notitle</link>
+    <pubDate>Tue, 27 Oct 2026 07:00:17 GMT</pubDate>
+  </item>
+  <item>
+    <title>Dublin Core date only</title>
+    <link>https://example.com/dc</link>
+    <dc:date>2026-10-26T12:30:00+02:00</dc:date>
+    <description>Uses dc:date instead of pubDate.</description>
+  </item>
+</channel>
+</rss>
