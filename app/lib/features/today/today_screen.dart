@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
 import '../../app/theme.dart';
+import '../../core/providers.dart' show feedFreshnessProvider;
 import '../shared/formatting.dart';
 import '../shared/widgets.dart';
 import 'today_controller.dart';
@@ -35,6 +36,13 @@ class TodayScreen extends ConsumerWidget {
       ),
       const SizedBox(height: 16),
       ..._banner(state),
+      if (state.picks.isNotEmpty && (ref.watch(feedFreshnessProvider)?.isStale(now) ?? false)) ...[
+        StatusBanner(
+          icon: Icons.schedule,
+          text: 'These stories were last gathered ${formatUpdated(ref.watch(feedFreshnessProvider)!.generatedAt, now)}. The news may be out of date.',
+        ),
+        const SizedBox(height: 16),
+      ],
     ];
 
     if (state.loading && state.picks.isEmpty) {

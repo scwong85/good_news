@@ -48,7 +48,7 @@ A design pass that gives the app its own warm, hopeful and still credible identi
 Tasks: final brand assets applied; release signing; release build installs and runs from a clean device; performance and battery check; Play Store listing, data-safety form and screenshots; manual QA checklist signed off; optional crash reporting only if opt-in.
 Acceptance: release build installs and runs from a clean device; store declarations match the app (no data collected); `release-checklist.md` fully signed off.
 
-## Future milestone A: Web via static JSON (starts after Phase 8)
+## Milestone A: Web via static JSON (started; built, publishing pending)
 Tasks: `export_static` job in the prototype producing the files in `static-feed-contract.md`; scheduled run (GitHub Actions cron or equivalent, added only when the owner asks); static hosting on GitHub Pages or Netlify; `StaticJsonStorySource`; Flutter web build (`--base-href`, hash routing); privacy page on the same host.
 Acceptance: web app loads the latest export in < 2 s on a typical mobile connection; same selection logic and UI as Android; stale-export handling.
 

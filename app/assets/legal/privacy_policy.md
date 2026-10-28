@@ -13,6 +13,9 @@ Last updated: 28 October 2026
 - Android's cloud backup is switched off for this app, so this information is not copied to your Google account. It is deleted when you uninstall the app.
 - When you tap "Read at <source>", your browser opens the publisher's page. When you share a story, the share sheet of your phone opens. Those apps and sites have their own policies.
 
+## The web version
+The web version at the site that hosts it works the same way, with one difference: it reads a daily-built list of headlines from that same site instead of asking each publisher. The site's host can see ordinary web-server logs (such as your internet address) when you open it; we add no analytics or cookies. Your saved stories, settings and hidden stories are stored in your browser only, and clearing the site's data removes them.
+
 ## What the app shows
 Only a headline, a short excerpt, the source and a link to the original story. The full story is always on the publisher's own site.
 
