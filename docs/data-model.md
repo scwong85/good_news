@@ -19,8 +19,8 @@ Index `(route, published_at desc)`, unique `canonical_url`. Pruned after 30 days
 ## bookmarks
 `article_id` pk, `saved_at`, `snapshot` (json: title, excerpt, source name, url, published_at) so saved items survive pruning and work offline.
 
-## feedback (local only)
-`id`, `article_id`, `signal` (`useful|too_trivial|not_credible|already_seen|not_for_me|made_my_day`), `created_at`. `not_credible` / report hides the article on this device and lowers ranking for its source.
+## feedback (local only, schema v4)
+`id`, `article_id`, `source_id`, `signal` (`not_for_me|too_trivial|not_credible|already_seen`), `created_at`. No foreign key, so it survives pruning. Hiding sets `articles.hidden`, removes the story from every day's picks and refills the slot; restoring clears the flag and the feedback rows. `not_credible` and `too_trivial` lower that source's ranking on this device: min(0.3, 0.10 x not_credible + 0.03 x too_trivial). `reminder_time` and `crash_reports_opt_in` below are not implemented (reminder deferred, no crash reporting).
 
 ## preferences (key-value, schema v2)
 `stories_per_day` (5-10, default 5), `topics`, `regions`, `sensitivity`, `enabled_sources`, `reminder_time` (optional, local notification), `crash_reports_opt_in` (default false).

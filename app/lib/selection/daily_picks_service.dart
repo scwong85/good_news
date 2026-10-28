@@ -1,5 +1,6 @@
 import '../data/db/app_database.dart';
 import 'daily_selector.dart';
+import 'feedback_penalty.dart';
 import 'preferences.dart';
 
 /// Creates and returns the day's picks (`before_select` hook: drops hidden, seen and
@@ -33,7 +34,8 @@ class DailyPicksService {
   Future<List<ArticleRow>> existingPicks() async {
     final prefs = await preferences.load();
     final picks = await db.picksForDay(dayKey(_now()));
-    return db.articlesByIds(picks.take(prefs.storiesPerDay).map((p) => p.articleId).toList());
+    final rows = await db.articlesByIds(picks.map((p) => p.articleId).toList());
+    return rows.where((a) => !a.hidden).take(prefs.storiesPerDay).toList();
   }
 
   Future<void> _queue = Future.value();
@@ -54,6 +56,7 @@ class DailyPicksService {
     final now = _now().toUtc();
     final day = dayKey(_now());
     final prefs = await preferences.load();
+    await db.removeHiddenPicks(day); // a story the reader hid never stays in the day's picks
     var picks = await db.picksForDay(day);
 
     if (picks.length < prefs.storiesPerDay) {
@@ -90,6 +93,7 @@ class DailyPicksService {
         now: now,
         preferredTopics: prefs.topics,
         seenClusterKeys: seenClusters,
+        sourcePenalties: sourcePenaltiesFromFeedback(await db.feedbackCountsBySource()),
         config: config,
       );
       await db.appendPicks(day, add);

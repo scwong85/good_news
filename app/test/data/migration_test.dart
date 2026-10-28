@@ -8,7 +8,7 @@ void main() {
   late SchemaVerifier verifier;
   setUpAll(() => verifier = SchemaVerifier(GeneratedHelper()));
 
-  test('upgrading v1 -> v3 keeps existing data and creates the new tables', () async {
+  test('upgrading v1 -> v4 keeps existing data and creates the new tables', () async {
     final schema = await verifier.schemaAt(1);
     // A v1 database as shipped with Phase 3: one source and one article.
     schema.rawDatabase.execute(
@@ -21,7 +21,7 @@ void main() {
     );
 
     final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 3);
+    await verifier.migrateAndValidate(db, 4);
 
     expect(await db.articleCount(), 1);
     expect((await db.latestArticles()).single.title, 'Old story');
@@ -43,7 +43,7 @@ void main() {
       "INSERT INTO preferences (key, value) VALUES ('stories_per_day', '9')",
     );
     final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 3);
+    await verifier.migrateAndValidate(db, 4);
     expect(await db.getPreference('stories_per_day'), '9');
     await db.addBookmark('x', '{"title":"t"}', DateTime.utc(2026, 10, 27));
     expect((await db.allBookmarks()).single.snapshot, '{"title":"t"}');
@@ -86,6 +86,19 @@ void main() {
     await db.pruneArticles(DateTime.utc(2100));
     expect(await db.picksForDay('2026-10-27'), isEmpty);
     expect(await db.seenIds(), isEmpty);
+    await db.close();
+  });
+
+  test('upgrading v3 -> v4 adds the feedback table and keeps bookmarks', () async {
+    final schema = await verifier.schemaAt(3);
+    final db = AppDatabase(schema.newConnection());
+    await verifier.migrateAndValidate(db, 4);
+    await db.addBookmark('x', '{}', DateTime.utc(2026, 10, 27));
+    await db.recordFeedback('x', 'a', 'not_credible', DateTime.utc(2026, 10, 27));
+    expect(await db.feedbackCountsBySource(), {
+      'a': {'not_credible': 1},
+    });
+    expect(await db.bookmarkedIds(), {'x'});
     await db.close();
   });
 }

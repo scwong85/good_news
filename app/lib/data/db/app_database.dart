@@ -14,12 +14,12 @@ part 'app_database.g.dart';
 String articleIdFor(String canonicalUrl) =>
     sha1.convert(utf8.encode(canonicalUrl)).toString().substring(0, 16);
 
-@DriftDatabase(tables: [Sources, Articles, DailyPicks, Seen, PreferenceEntries, Bookmarks])
+@DriftDatabase(tables: [Sources, Articles, DailyPicks, Seen, PreferenceEntries, Bookmarks, FeedbackEntries])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -34,6 +34,10 @@ class AppDatabase extends _$AppDatabase {
           if (from < 3) {
             // v3 (Phase 5): saved stories.
             await m.createTable(bookmarks);
+          }
+          if (from < 4) {
+            // v4 (Phase 6): local-only reports / hidden stories.
+            await m.createTable(feedbackEntries);
           }
         },
         beforeOpen: (details) async {
@@ -301,6 +305,52 @@ class AppDatabase extends _$AppDatabase {
 
   Future<Set<String>> bookmarkedIds() async =>
       (await select(bookmarks).get()).map((r) => r.articleId).toSet();
+
+  // --- reports and hidden stories -----------------------------------------------------------
+
+  Future<void> recordFeedback(String articleId, String sourceId, String signal, DateTime at) =>
+      into(feedbackEntries).insert(
+        FeedbackEntriesCompanion.insert(articleId: articleId, sourceId: sourceId, signal: signal, createdAt: at),
+      );
+
+  /// `{sourceId: {signal: count}}` over all reports.
+  Future<Map<String, Map<String, int>>> feedbackCountsBySource() async {
+    final out = <String, Map<String, int>>{};
+    for (final r in await select(feedbackEntries).get()) {
+      final bySignal = out.putIfAbsent(r.sourceId, () => {});
+      bySignal[r.signal] = (bySignal[r.signal] ?? 0) + 1;
+    }
+    return out;
+  }
+
+  Future<void> deleteFeedbackFor(String articleId) =>
+      (delete(feedbackEntries)..where((t) => t.articleId.equals(articleId))).go();
+
+  Future<void> setHidden(String articleId, bool hidden) => (update(articles)..where((t) => t.id.equals(articleId)))
+      .write(ArticlesCompanion(hidden: Value(hidden)));
+
+  /// Takes a story out of every day's picks (used when the reader hides it).
+  Future<void> removePicksOf(String articleId) =>
+      (delete(dailyPicks)..where((t) => t.articleId.equals(articleId))).go();
+
+  /// Drops picks of hidden stories for [day] (defensive; hiding already removes them).
+  Future<void> removeHiddenPicks(String day) async {
+    final hidden = await (selectOnly(articles)
+          ..addColumns([articles.id])
+          ..where(articles.hidden.equals(true)))
+        .get();
+    final ids = hidden.map((r) => r.read(articles.id)!).toList();
+    if (ids.isEmpty) return;
+    await (delete(dailyPicks)..where((t) => t.day.equals(day) & t.articleId.isIn(ids))).go();
+  }
+
+  /// Hidden stories with their sources, newest first, so the reader can bring them back.
+  Future<List<(ArticleRow, SourceRow)>> hiddenArticles() async {
+    final query = select(articles).join([innerJoin(sources, sources.id.equalsExp(articles.sourceId))])
+      ..where(articles.hidden.equals(true))
+      ..orderBy([OrderingTerm.desc(articles.publishedAt)]);
+    return (await query.get()).map((r) => (r.readTable(articles), r.readTable(sources))).toList();
+  }
 
   Future<String?> getPreference(String key) async =>
       (await (select(preferenceEntries)..where((t) => t.key.equals(key))).getSingleOrNull())?.value;

@@ -18,10 +18,11 @@ Calm, trustworthy app that gives a small daily briefing (5-10 stories, user sett
 - No LLM dependency.
 - Do not build or host the web app, and do not add servers, until the owner starts that milestone.
 - Don't add CI workflows until the owner asks.
+- Roadmap after Phase 5: Phase 6 hardening (done in code), Phase 7 UI overhaul (`docs/ui-overhaul.md`, planned), Phase 8 release (`docs/release-checklist.md`).
 
 ## Workflow
 - Follow the phase order in `docs/implementation-plan.md`; update the tracker, decisions and open questions in `docs/decision-log.md`.
 - Skills in `.claude/skills/` cover each area (`flutter-app`, `rss-ingestion`, `rule-based-classification`, `deduplication`, `privacy-and-content-licensing`, `evaluation-and-test-writing`, `pipeline-prototype`; `static-feed-export`, `local-embeddings`, `llm-enrichment` are future).
-- A Stop hook runs `scripts/dev-check.sh` (rules sync check, `flutter analyze/test` once `app/` exists; set `DEV_CHECK_PROTOTYPE=1` to include the Python prototype, which needs Postgres).
+- A Stop hook runs `scripts/dev-check.sh` (rules and legal-asset sync checks, `flutter analyze/test` once `app/` exists; set `DEV_CHECK_PROTOTYPE=1` to include the Python prototype, which needs Postgres).
 - Commands (Flutter is at `/opt/flutter/bin`): app `cd app && flutter analyze && flutter test`; prototype `cd tools/pipeline-prototype && uv run pytest`; rules sync `scripts/sync-rules.sh`.
 - Tests never hit the live network; use fixture feeds.

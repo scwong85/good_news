@@ -26,10 +26,10 @@ Widget tests drive the whole app on in-memory SQLite and a fake web (`test/suppo
 ## Safety
 - The app never displays more than the stored excerpt and never fetches article pages.
 - Every story links to the original publisher.
-- A reported/hidden story never reappears on that device.
+- A reported/hidden story never reappears on that device (`test/selection/feedback_test.dart`, `test/ui/hide_report_test.dart`).
 - A disabled source is never requested.
 - Excluded and blocklisted items never appear in Today or Explore.
-- No network calls other than feed requests (verify with a proxy in manual QA).
+- No network calls other than feed requests (verify with a proxy in manual QA). `test/policy_test.dart` guards the manifest (INTERNET only, no services/receivers, backup off), banned analytics/ads/background packages, and that the bundled privacy policy equals `docs/legal/`.
 
 ## Performance budgets (verify on a mid-range device)
 Cached launch to content < 1 s; refresh of 10 sources completes or times out within 15 s; memory stays reasonable with 30 days of articles.

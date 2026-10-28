@@ -115,3 +115,18 @@ class Bookmarks extends Table {
   @override
   Set<Column> get primaryKey => {articleId};
 }
+
+/// Reader reports ("not credible", "too trivial", ...). Stays on this phone: it only hides the
+/// story here and lowers how often its source is picked. No foreign key: the record (and the
+/// source penalty) must survive the clean-up of old articles.
+@DataClassName('FeedbackRow')
+class FeedbackEntries extends Table {
+  @override
+  String get tableName => 'feedback';
+
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get articleId => text()();
+  TextColumn get sourceId => text()();
+  TextColumn get signal => text()();
+  DateTimeColumn get createdAt => dateTime()();
+}

@@ -43,7 +43,13 @@ Status: **active**, or **superseded by #n**.
 | 41 | `DailyPicksService.todaysPicks()` is serialized and `appendPicks` ignores stories already picked that day (a race found by UI tests: a fast slider drag produced 11 picks from 8 articles). The settings slider saves only when released | 2026-10-27 | active |
 | 42 | Bookmarks (schema v3) store a snapshot (headline, short excerpt, source, link, date, classification) with no foreign key, so saved stories survive cleanup of old articles and open offline. `markSeen` ignores ids with no article | 2026-10-27 | active |
 | 43 | Each story explains itself ("Why this story was included") in plain language from the stored rule matches, with an honest footnote that no person checked it | 2026-10-27 | active |
-| 44 | Content sensitivity and digest-time preferences are deferred (undefined behaviour; digest needs the Phase 6 local reminder) | 2026-10-27 | active |
+| 44 | Content sensitivity and digest-time preferences are deferred (undefined behaviour; digest needs a reminder, see 45) | 2026-10-27 | active |
+| 45 | Local daily reminder is deferred: a notifications plugin needs exact-alarm/boot permissions and background receivers, which conflicts with "fetch-on-open, no background work". Revisit only with a design that needs no extra permissions | 2026-10-28 | active |
+| 46 | Hide or report is local only (schema v4 `feedback` table, no FK so it survives pruning). Four reasons: not for me, too trivial, not credible, already seen. A hidden story is removed from every day's picks, its slot refilled, and never returns. This is the one exception to "picks are append-only"; Undo and Settings, Hidden stories restore it and clear its feedback | 2026-10-28 | active |
+| 47 | Feedback affects ranking only through a per-source penalty: min(0.3, 0.10 x not-credible + 0.03 x too-trivial). "Not for me" and "already seen" never penalise a source. Nothing leaves the phone | 2026-10-28 | active |
+| 48 | Privacy policy canonical in `docs/legal/privacy-policy.md`, copied to the app asset by `scripts/sync-legal.sh` (checked by dev-check). Contact address comes from `--dart-define=CONTACT_EMAIL`; the contact tile is hidden when unset, and a release must set it (release checklist) | 2026-10-28 | active |
+| 49 | Hardening enforced by tests: only the INTERNET permission, no services/receivers/providers, `allowBackup=false`, no cleartext, banned analytics/ads/background packages. No telemetry or crash reporting | 2026-10-28 | active |
+| 50 | Roadmap: Phase 6 hardening, **Phase 7 UI overhaul** (`ui-overhaul.md`), Phase 8 release. Web stays future milestone A | 2026-10-28 | active |
 | 25 | State management Riverpod, storage Drift/SQLite, routing go_router | 2026-10-27 | active for Riverpod 3 (DI only so far) and Drift; go_router still proposed (Phase 5) |
 | 31 | Dart port differences from the Python reference: no language detection (items use the source's language), no Unicode NFC normalization, own XML sanitizer (bare `&`, HTML named entities, control chars, BOM, ISO-8859-1) because the `xml` package is strict. URL canonicalization is checked against the Python output (`app/test/fixtures/golden_urls.json`, 41 cases) | 2026-10-27 | active |
 | 32 | Phase 3 libraries: `http`, `xml`, `html`, `crypto`, `drift` + `drift_flutter`, `flutter_riverpod`. Drift row classes are `SourceRow`/`ArticleRow`; generated code is committed; Drift returns local-time `DateTime`s, so compare instants/UTC | 2026-10-27 | active |
@@ -53,7 +59,9 @@ Status: **active**, or **superseded by #n**.
 ## Open questions
 - Human review of the 290 draft labels (priority: `test2` and items marked borderline); they were all labeled by Claude.
 - Per-source terms/licensing review for direct client-side fetching by end users.
-- Contact address for takedown requests; privacy policy hosting (needed for the Play Store).
+- Contact address for takedown requests (build with `CONTACT_EMAIL`); privacy policy hosting at a public URL (the Play Store needs one; text is in `docs/legal/privacy-policy.md`).
+- Brand: app name, logo, colours and fonts for the UI overhaul (Phase 7).
+- Reminder notification: deferred (decision 45).
 - Project name, application id and Play Store account.
 - Web milestone: GitHub Pages vs Netlify, and the scheduler for the export job.
 - **Phase 3/4 device check:** build and run the app on an Android device/emulator (not possible in the cloud session) and confirm the harness screen fetches and lists stories.
@@ -70,7 +78,9 @@ Status: **active**, or **superseded by #n**.
 | 3 Flutter app foundation (Android) | Done in code: models, fetcher, parser, normalizer, Drift DB, ingestion service, harness screen, 113 tests, live-feed check. **Not yet built or run on a device/emulator** |
 | 4 On-device classification, de-dup, daily selection | Done in code: Dart classifier (306/306 golden cases), title de-duplication, ranker, selector, picks service, DB v2 + migration, 226 tests, live-feed check. Acceptance (3) partly met (see plan). **Not yet run on a device** |
 | 5 Android UI | Done in code: Today, Explore, Story, Saved, Settings and About screens; 319 Flutter tests (accessibility, responsive, reader journey); integration test written. **Not yet run on a device** |
-| 6 Android hardening and release | Not started |
+| 6 Android hardening | Done in code: hide/report with local source penalties (DB v4), Hidden stories, in-app privacy policy, contact config, manifest hardening and policy tests, release checklist. **Not yet run on a device** |
+| 7 UI overhaul (good-news identity) | Planned: see `ui-overhaul.md`; needs owner brand choices |
+| 8 Release | Not started: signing, device checks, store listing |
 | Future A: Web via static JSON | Future |
 | Future B: Remote rules and editorial loop | Future |
 | Future C: Optional extras (ML, LLM, iOS, server) | Future |

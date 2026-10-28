@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
 import '../../app/theme.dart';
+import '../../selection/feedback_service.dart';
 import '../shared/formatting.dart';
+import '../today/today_controller.dart';
 import '../shared/story.dart';
 import '../shared/widgets.dart';
 import 'why_included.dart';
@@ -124,8 +126,87 @@ class _StoryView extends ConsumerWidget {
               ),
               const SizedBox(height: 28),
               _WhySection(why: why),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.visibility_off_outlined),
+                  label: const Text('Hide or report this story'),
+                  onPressed: () => _hide(context, ref, story),
+                ),
+              ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+Future<void> _hide(BuildContext context, WidgetRef ref, Story story) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final navigator = Navigator.of(context);
+  final reason = await showModalBottomSheet<HideReason>(
+    context: context,
+    showDragHandle: true,
+    isScrollControlled: true,
+    builder: (_) => const _HideSheet(),
+  );
+  if (reason == null) return;
+  // Read everything from `ref` now: this screen is gone by the time Undo is tapped.
+  final service = ref.read(feedbackServiceProvider);
+  final version = ref.read(dataVersionProvider.notifier);
+  final today = ref.read(todayControllerProvider.notifier);
+  await service.hide(articleId: story.id, sourceId: story.sourceId, reason: reason);
+  version.bump();
+  await today.reloadPicks(extend: true); // refill the slot
+  if (navigator.canPop()) navigator.pop();
+  messenger
+    ..clearSnackBars()
+    ..showSnackBar(SnackBar(
+      content: const Text('Story hidden on this phone'),
+      action: SnackBarAction(
+        label: 'Undo',
+        onPressed: () async {
+          await service.restore(story.id);
+          version.bump();
+          await today.reloadPicks(extend: true);
+        },
+      ),
+    ));
+}
+
+class _HideSheet extends StatelessWidget {
+  const _HideSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text('Why hide this story?', style: text.titleMedium),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+              child: Text(
+                'This stays on your phone. The story will not appear again, and you can bring it back under Settings, Hidden stories.',
+                style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+            ),
+            for (final r in HideReason.values)
+              ListTile(
+                title: Text(r.label),
+                subtitle: Text(r.description),
+                onTap: () => Navigator.of(context).pop(r),
+              ),
+          ],
         ),
       ),
     );

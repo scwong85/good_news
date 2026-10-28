@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/explore/explore_screen.dart';
+import '../features/hidden/hidden_screen.dart';
+import '../features/privacy/privacy_screen.dart';
 import '../features/saved/saved_screen.dart';
 import '../features/settings/about_screen.dart';
 import '../features/settings/settings_screen.dart';
@@ -30,6 +32,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, state) => StoryScreen(storyId: state.pathParameters['id']!),
       ),
       GoRoute(path: '/about', parentNavigatorKey: rootKey, builder: (_, _) => const AboutScreen()),
+      GoRoute(path: '/hidden', parentNavigatorKey: rootKey, builder: (_, _) => const HiddenScreen()),
+      GoRoute(path: '/privacy', parentNavigatorKey: rootKey, builder: (_, _) => const PrivacyScreen()),
     ],
   );
 });

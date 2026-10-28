@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
+import '../../core/config.dart';
 import '../../core/providers.dart';
 import '../../selection/daily_selector.dart';
 import '../explore/explore_screen.dart' show exploreTopics;
@@ -122,11 +123,38 @@ class SettingsScreen extends ConsumerWidget {
                       const SizedBox(height: 16),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.visibility_off_outlined),
+                        title: const Text('Hidden stories'),
+                        subtitle: const Text('Bring back stories you hid or reported'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => context.push('/hidden'),
+                      ),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
                         leading: const Icon(Icons.info_outline),
                         title: const Text('About and how stories are chosen'),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => context.push('/about'),
                       ),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: const Icon(Icons.privacy_tip_outlined),
+                        title: const Text('Privacy policy'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => context.push('/privacy'),
+                      ),
+                      if (ref.watch(appConfigProvider).hasContact)
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.mail_outline),
+                          title: const Text('Contact and removal requests'),
+                          subtitle: const Text('Publishers and readers can ask us to remove a source or story'),
+                          onTap: () => ref.read(linkOpenerProvider).open(Uri(
+                                scheme: 'mailto',
+                                path: ref.read(appConfigProvider).contactEmail,
+                                queryParameters: {'subject': 'Good News: removal request'},
+                              )),
+                        ),
                       const SizedBox(height: 8),
                       Text(
                         'No account. Nothing about you leaves this phone: the app only asks the news sources for their latest headlines.',

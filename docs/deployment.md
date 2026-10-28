@@ -2,6 +2,8 @@
 
 ## Milestone 1: Android app
 - Build: `flutter build appbundle --release`. Release signing keystore and `key.properties` are never committed (see `.gitignore`).
+- Signing (not applied yet): create an upload keystore outside the repo, put its details in `android/key.properties` (git-ignored: `storeFile`, `storePassword`, `keyAlias`, `keyPassword`), and read them in `android/app/build.gradle` to define `signingConfigs.release`. Use Play App Signing. Full steps are in `release-checklist.md`.
+- Build with the contact address: `flutter build appbundle --release --dart-define=CONTACT_EMAIL=you@example.org`.
 - Distribution: Google Play (internal testing track first), plus APK for sideload testing.
 - Required for the store: a **privacy policy URL** and a data-safety form (declare no data collected). The policy page needs static hosting, so a minimal GitHub Pages site (or a repository-hosted page) is part of the release step. Include a contact address for takedown/removal requests (open item).
 - No servers, databases, schedulers or secrets are needed.

@@ -16,3 +16,5 @@ description: Flutter app for Good News (Android first): architecture, layers, UI
 - Today is cache-first (`TodayController`); create/extend picks only after a refresh; `todaysPicks()` is serialized.
 - Test with `test/support/app_harness.dart` (in-memory DB, fake web, fake link/share). Use `ensureVisible` + a short pump before tapping off-screen widgets; load assets with `cache: false` for one-off reads.
 - Checks: `flutter analyze && flutter test`. Never commit signing keys. Do not add CI until asked.
+- Hide/report: `FeedbackService` (local, schema v4); hidden stories leave all picks and never return; source penalties in `selection/feedback_penalty.dart`. Privacy policy lives in `docs/legal/` (run `scripts/sync-legal.sh`); contact via `--dart-define=CONTACT_EMAIL`. `test/policy_test.dart` forbids new permissions, services and tracking packages: revisit the policy and store data-safety answers before changing it.
+- Phase 7 is a UI overhaul (`docs/ui-overhaul.md`): change look via theme tokens only; keep accessibility tests green.

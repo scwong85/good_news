@@ -111,6 +111,8 @@ void main() {
       await openApp(tester, h);
       await goTo(tester, 'Settings');
       await tester.scrollUntilVisible(find.text('About and how stories are chosen'), 300, scrollable: find.byType(Scrollable).first);
+      await tester.ensureVisible(find.text('About and how stories are chosen'));
+      await tester.pump(const Duration(milliseconds: 400));
       await tester.tap(find.text('About and how stories are chosen'));
       await pumpUntilFound(tester, find.text('How stories are chosen'));
       expect(find.text('What to keep in mind'), findsOneWidget);

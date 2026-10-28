@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Dev-workflow check used by the Claude Code Stop hook (.claude/settings.json).
 # Runs checks for whichever parts of the repo exist. Exits 2 (block) on failure.
-#   - rules / sources asset sync checks and the golden URL fixture check
+#   - rules / legal / sources asset sync checks and the golden URL fixture check
 #   - Flutter app: analyze + test (when app/pubspec.yaml and flutter exist)
 #   - Python reference pipeline: only when DEV_CHECK_PROTOTYPE=1 (needs Postgres)
 set -u
@@ -9,6 +9,7 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 status=0
 
 "$root/scripts/sync-rules.sh" --check || status=2
+"$root/scripts/sync-legal.sh" --check || status=2
 python3 "$root/scripts/sync-sources.py" --check || status=2
 python3 "$root/scripts/export-url-golden.py" --check || status=2
 

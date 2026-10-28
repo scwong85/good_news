@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/providers.dart';
 import '../data/story_repository.dart';
+import '../selection/feedback_service.dart';
 import '../selection/preferences.dart';
 import '../features/shared/story.dart';
 import 'platform_services.dart';
@@ -49,6 +50,15 @@ final preferencesProvider = FutureProvider<Preferences>((ref) {
 final sourcesProvider = FutureProvider((ref) {
   ref.watch(dataVersionProvider);
   return ref.watch(databaseProvider).allSources();
+});
+
+final feedbackServiceProvider = Provider<FeedbackService>((ref) => FeedbackService(ref.watch(databaseProvider)));
+
+/// Stories the reader hid, newest first.
+final hiddenStoriesProvider = FutureProvider<List<Story>>((ref) async {
+  ref.watch(dataVersionProvider);
+  final rows = await ref.watch(databaseProvider).hiddenArticles();
+  return [for (final (a, s) in rows) Story.fromRows(a, s)];
 });
 
 final regionsProvider = FutureProvider<List<String>>((ref) {
