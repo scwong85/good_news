@@ -19,13 +19,14 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: rootKey,
     routes: [
-      StatefulShellRoute.indexedStack(
+      StatefulShellRoute(
         builder: (context, state, shell) => AppShell(shell: shell),
+        navigatorContainerBuilder: (context, shell, children) => _TabPager(shell: shell, children: children),
         branches: [
-          StatefulShellBranch(routes: [GoRoute(path: '/', builder: (_, _) => const TodayScreen())]),
-          StatefulShellBranch(routes: [GoRoute(path: '/explore', builder: (_, _) => const ExploreScreen())]),
-          StatefulShellBranch(routes: [GoRoute(path: '/saved', builder: (_, _) => const SavedScreen())]),
-          StatefulShellBranch(routes: [GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen())]),
+          StatefulShellBranch(preload: true, routes: [GoRoute(path: '/', builder: (_, _) => const TodayScreen())]),
+          StatefulShellBranch(preload: true, routes: [GoRoute(path: '/explore', builder: (_, _) => const ExploreScreen())]),
+          StatefulShellBranch(preload: true, routes: [GoRoute(path: '/saved', builder: (_, _) => const SavedScreen())]),
+          StatefulShellBranch(preload: true, routes: [GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen())]),
         ],
       ),
       GoRoute(
@@ -54,15 +55,6 @@ class AppShell extends ConsumerWidget {
 
   void _go(int i) => shell.goBranch(i, initialLocation: i == shell.currentIndex);
 
-  /// Swiping left goes to the next tab, right to the previous one. Scrollable children (the
-  /// topic chips, the slider) take their own horizontal drags first.
-  void _swipe(DragEndDetails d) {
-    final v = d.primaryVelocity ?? 0;
-    if (v.abs() < 300) return;
-    final next = (shell.currentIndex + (v < 0 ? 1 : -1)).clamp(0, _destinations.length - 1);
-    if (next != shell.currentIndex) _go(next);
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final seen = ref.watch(welcomeStateProvider);
@@ -86,13 +78,13 @@ class AppShell extends ConsumerWidget {
               ],
             ),
             const VerticalDivider(width: 1),
-            Expanded(child: GestureDetector(onHorizontalDragEnd: _swipe, child: shell)),
+            Expanded(child: shell),
           ],
         ),
       );
     }
     return Scaffold(
-      body: GestureDetector(onHorizontalDragEnd: _swipe, child: shell),
+      body: shell,
       bottomNavigationBar: NavigationBar(
         selectedIndex: shell.currentIndex,
         onDestinationSelected: _go,
@@ -102,5 +94,85 @@ class AppShell extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+/// The tabs side by side in a [PageView]: dragging follows the finger and settles smoothly, and
+/// tapping a tab slides to it. Every tab stays alive, so scroll positions and searches survive.
+/// Scrollable children (topic chips, the slider) take their own horizontal drags first.
+class _TabPager extends StatefulWidget {
+  const _TabPager({required this.shell, required this.children});
+  final StatefulNavigationShell shell;
+  final List<Widget> children;
+
+  @override
+  State<_TabPager> createState() => _TabPagerState();
+}
+
+class _TabPagerState extends State<_TabPager> {
+  late final PageController _controller = PageController(initialPage: widget.shell.currentIndex);
+  bool _animating = false; // a tap-driven slide passes through the tabs in between
+
+  @override
+  void didUpdateWidget(_TabPager old) {
+    super.didUpdateWidget(old);
+    final target = widget.shell.currentIndex;
+    if (!_controller.hasClients || (_controller.page ?? target.toDouble()).round() == target) return;
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.jumpToPage(target);
+    } else {
+      _animating = true;
+      _controller
+          .animateToPage(target, duration: const Duration(milliseconds: 260), curve: Curves.easeOutCubic)
+          .whenComplete(() => _animating = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => PageView(
+        controller: _controller,
+        onPageChanged: (i) {
+          if (!_animating && i != widget.shell.currentIndex) widget.shell.goBranch(i);
+        },
+        children: [
+          for (var i = 0; i < widget.children.length; i++)
+            // Every tab stays alive, but only tabs that are on screen are visible to touch,
+            // search and screen readers (like an indexed stack, with a sliding hand-over).
+            AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                final page = _controller.hasClients && _controller.position.haveDimensions
+                    ? _controller.page!
+                    : widget.shell.currentIndex.toDouble();
+                return Offstage(offstage: (i - page).abs() >= 1, child: child);
+              },
+              child: _KeepAlive(child: widget.children[i]),
+            ),
+        ],
+      );
+}
+
+class _KeepAlive extends StatefulWidget {
+  const _KeepAlive({required this.child});
+  final Widget child;
+
+  @override
+  State<_KeepAlive> createState() => _KeepAliveState();
+}
+
+class _KeepAliveState extends State<_KeepAlive> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
   }
 }

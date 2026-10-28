@@ -39,7 +39,7 @@ void main() {
     await settle(tester, rounds: 10);
 
     await goTo(tester, 'Settings');
-    await tester.scrollUntilVisible(find.text('Hidden stories'), 200);
+    await tester.scrollUntilVisible(find.text('Hidden stories'), 200, scrollable: screenScrollable);
     await tester.ensureVisible(find.text('Hidden stories'));
     await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.text('Hidden stories'));
@@ -55,7 +55,7 @@ void main() {
     addTearDown(h.dispose);
     await openApp(tester, h);
     await goTo(tester, 'Settings');
-    await tester.scrollUntilVisible(find.text('Privacy policy'), 200);
+    await tester.scrollUntilVisible(find.text('Privacy policy'), 200, scrollable: screenScrollable);
     await tester.ensureVisible(find.text('Privacy policy'));
     await tester.pump(const Duration(milliseconds: 400));
     await tester.tap(find.text('Privacy policy'));

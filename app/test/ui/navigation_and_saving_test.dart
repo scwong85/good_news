@@ -75,4 +75,34 @@ void main() {
     }
     expect(tab(), 3);
   });
+
+  testWidgets('swiping slides between tabs instead of jumping, and tapping a far tab does not bounce', (tester) async {
+    tester.view.physicalSize = const Size(400, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final h = AppHarness();
+    addTearDown(h.dispose);
+    await openApp(tester, h);
+    int tab() => tester.widget<NavigationBar>(find.byType(NavigationBar)).selectedIndex;
+    expect(find.text('Search stories'), findsNothing); // other tabs are not on screen
+
+    // Halfway through a drag both neighbouring tabs are on screen at once.
+    final drag = await tester.startGesture(const Offset(300, 400));
+    await drag.moveBy(const Offset(-40, 0));
+    await tester.pump();
+    await drag.moveBy(const Offset(-150, 0));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+    expect(find.text('Search stories'), findsOneWidget); // Explore is sliding in beside Today
+    expect(storyCards, findsWidgets); // while Today is still partly visible
+    expect(tab(), 0); // not switched until the drag settles
+    await drag.up();
+    await settle(tester, rounds: 8);
+    expect(tab(), anyOf(0, 1));
+
+    // Tapping a tab three places away lands there and stays there.
+    await goTo(tester, 'Settings');
+    await settle(tester, rounds: 6);
+    expect(tab(), 3);
+  });
 }

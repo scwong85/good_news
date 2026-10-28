@@ -112,7 +112,7 @@ void main() {
       addTearDown(h.dispose);
       await openApp(tester, h);
       await goTo(tester, 'Settings');
-      await tester.scrollUntilVisible(find.text('About and how stories are chosen'), 300, scrollable: find.byType(Scrollable).first);
+      await tester.scrollUntilVisible(find.text('About and how stories are chosen'), 300, scrollable: screenScrollable);
       await tester.ensureVisible(find.text('About and how stories are chosen'));
       await tester.pump(const Duration(milliseconds: 400));
       await tester.tap(find.text('About and how stories are chosen'));

@@ -123,6 +123,9 @@ class AppHarness {
   Future<void> dispose() => db.close();
 }
 
+/// The vertical scroll view of the tab on screen (the tab pager is itself a horizontal Scrollable).
+Finder get screenScrollable => find.descendant(of: find.byType(ListView), matching: find.byType(Scrollable)).first;
+
 /// Tests start past the first-run welcome unless they ask for it.
 class AlwaysSeenWelcome extends WelcomeState {
   @override
@@ -179,7 +182,7 @@ Future<void> goTo(WidgetTester tester, String label) async {
   await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(label)).evaluate().isNotEmpty
       ? find.descendant(of: find.byType(NavigationBar), matching: find.text(label))
       : find.descendant(of: find.byType(NavigationRail), matching: find.text(label)));
-  await settle(tester, rounds: 6);
+  await settle(tester, rounds: 10); // includes the 260 ms slide between tabs
 }
 
 /// Boots the app and waits until at least one story card is on screen.
