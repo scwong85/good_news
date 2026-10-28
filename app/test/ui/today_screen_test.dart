@@ -132,8 +132,8 @@ void main() {
     await openApp(tester, h);
     await tester.ensureVisible(find.text('Browse more in Explore'));
     await tester.pump();
-    expect(find.text("That's everything for today."), findsOneWidget);
-    expect(find.text('Come back tomorrow for more.'), findsOneWidget);
+    expect(find.text("You're all caught up."), findsOneWidget);
+    expect(find.textContaining('Come back tomorrow'), findsOneWidget);
     await tester.tap(find.text('Browse more in Explore'));
     await settle(tester, rounds: 6);
     expect(find.text('Search stories'), findsOneWidget);

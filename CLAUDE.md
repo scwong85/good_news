@@ -17,7 +17,7 @@ Calm, trustworthy app that gives a small daily briefing (5-10 stories, user sett
 - Privacy: no accounts, analytics or ads; data stays on the device; telemetry only if opt-in.
 - No LLM dependency.
 - The web app is published to GitHub Pages by the one workflow the owner asked for (`.github/workflows/pages.yml`: daily export + deploy). Don't add other CI workflows, servers or schedulers until the owner asks. No server we operate, ever, without the owner.
-- Roadmap after Phase 5: Phase 6 hardening (done in code), Phase 7 UI overhaul (`docs/ui-overhaul.md`, planned), Phase 8 release (`docs/release-checklist.md`).
+- Roadmap after Phase 5: Phase 6 hardening (done in code), Phase 7 UI overhaul (`docs/ui-overhaul.md`, built; owner sign-off pending), Phase 8 release (`docs/release-checklist.md`).
 
 ## Workflow
 - Follow the phase order in `docs/implementation-plan.md`; update the tracker, decisions and open questions in `docs/decision-log.md`.

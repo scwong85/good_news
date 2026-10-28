@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/brand.dart';
 import '../../app/providers.dart';
 import '../shared/story.dart';
 import '../shared/widgets.dart';
@@ -39,9 +40,10 @@ class SavedScreen extends ConsumerWidget {
         error: (_, _) => const EmptyState(icon: Icons.error_outline, title: "Couldn't load saved stories"),
         data: (stories) {
           if (stories.isEmpty) {
-            return const ScrollableCenter(
+            return ScrollableCenter(
               child: EmptyState(
                 icon: Icons.bookmark_border,
+                illustration: const SproutMark(size: 84),
                 title: 'Nothing saved yet',
                 message: 'Tap the bookmark on any story to keep it here. Saved stories are available offline.',
               ),

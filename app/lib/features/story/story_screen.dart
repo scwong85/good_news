@@ -102,7 +102,7 @@ class _StoryView extends ConsumerWidget {
                 Wrap(
                   spacing: 8,
                   runSpacing: 4,
-                  children: [for (final t in story.topics) Chip(label: Text(topicLabel(t)), visualDensity: VisualDensity.compact)],
+                  children: [for (final t in story.topics) TopicChip(topic: t)],
                 ),
               ],
               if (story.excerpt.isNotEmpty) ...[

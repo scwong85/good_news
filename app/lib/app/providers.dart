@@ -52,6 +52,28 @@ final sourcesProvider = FutureProvider((ref) {
   return ref.watch(databaseProvider).allSources();
 });
 
+/// Whether the first-run welcome has been shown (one local flag). `true` while it is loading,
+/// so returning readers never see a flash of the welcome.
+class WelcomeState extends Notifier<bool> {
+  static const _key = 'welcome_seen';
+
+  @override
+  bool build() {
+    final db = ref.read(databaseProvider);
+    db.getPreference(_key).then((v) {
+      if (ref.mounted && v == null) state = false;
+    });
+    return true;
+  }
+
+  Future<void> markSeen() async {
+    state = true;
+    await ref.read(databaseProvider).setPreference(_key, '1');
+  }
+}
+
+final welcomeStateProvider = NotifierProvider<WelcomeState, bool>(WelcomeState.new);
+
 final feedbackServiceProvider = Provider<FeedbackService>((ref) => FeedbackService(ref.watch(databaseProvider)));
 
 /// Stories the reader hid, newest first.

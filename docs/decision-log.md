@@ -51,6 +51,7 @@ Status: **active**, or **superseded by #n**.
 | 49 | Hardening enforced by tests: only the INTERNET permission, no services/receivers/providers, `allowBackup=false`, no cleartext, banned analytics/ads/background packages. No telemetry or crash reporting | 2026-10-28 | active |
 | 50 | Roadmap: Phase 6 hardening, **Phase 7 UI overhaul** (`ui-overhaul.md`), Phase 8 release. Web stays future milestone A | 2026-10-28 | active |
 | 55 | Owner asked for the daily export and publishing (2026-10-28): one workflow, `.github/workflows/pages.yml` (push to main + daily cron + manual), GitHub Pages via Actions, base href from the repo name, `CONTACT_EMAIL` from a repository variable. Every run also runs analyze and the tests. No history carry-over between exports yet | 2026-10-28 | active |
+| 56 | Phase 7 started 2026-10-28 without owner brand choices, so defaults were chosen and documented: name "Good News", seed green 2E7D5B with warm cream surfaces and amber sun, Source Serif 4 + Nunito Sans (bundled, OFL), original sunrise mark drawn in code and rendered to icons by `scripts/make-icons.py`. No publisher images (owner confirmed no picture fetching). Welcome shown once, stored as the `welcome_seen` preference | 2026-10-28 | active |
 | 51 | Web milestone A started by the owner (2026-10-28). The same Flutter app builds for web (`app/web/`); `kIsWeb` swaps `DirectRssStorySource` for `StaticJsonStorySource`; Drift runs on WebAssembly SQLite (`sqlite3.wasm` + compiled `drift_worker.js` committed in `app/web/`). Publishing, a scheduler and CI are still not done (owner decision) | 2026-10-28 | active |
 | 52 | The exporter is a Dart tool, not the Python/Django prototype: it reuses the app's own fetch/parse/normalize/classify code (no drift between app and export, no Postgres to run). The Python pipeline stays the rules-evaluation reference. The web app re-classifies locally; exported classification is informational | 2026-10-28 | active |
 | 53 | Web build uses `--no-web-resources-cdn` (bundled CanvasKit and fonts) so a visit makes only same-origin requests; checked in headless Chromium. Hash routing (go_router default); `404.html` copy of `index.html` for Pages | 2026-10-28 | active |
@@ -65,7 +66,7 @@ Status: **active**, or **superseded by #n**.
 - Human review of the 290 draft labels (priority: `test2` and items marked borderline); they were all labeled by Claude.
 - Per-source terms/licensing review for direct client-side fetching by end users.
 - Contact address for takedown requests (build with `CONTACT_EMAIL`); privacy policy hosting at a public URL (the Play Store needs one; text is in `docs/legal/privacy-policy.md`).
-- Brand: app name, logo, colours and fonts for the UI overhaul (Phase 7).
+- Brand: final app name and logo, and sign-off on the default colours and fonts used in Phase 7.
 - Reminder notification: deferred (decision 45).
 - Project name, application id and Play Store account.
 - Web milestone: publish where (GitHub Pages vs Netlify), and whether to add a scheduled export (GitHub Actions cron) and history carry-over between exports.
@@ -84,7 +85,7 @@ Status: **active**, or **superseded by #n**.
 | 4 On-device classification, de-dup, daily selection | Done in code: Dart classifier (306/306 golden cases), title de-duplication, ranker, selector, picks service, DB v2 + migration, 226 tests, live-feed check. Acceptance (3) partly met (see plan). **Not yet run on a device** |
 | 5 Android UI | Done in code: Today, Explore, Story, Saved, Settings and About screens; 319 Flutter tests (accessibility, responsive, reader journey); integration test written. **Not yet run on a device** |
 | 6 Android hardening | Done in code: hide/report with local source penalties (DB v4), Hidden stories, in-app privacy policy, contact config, manifest hardening and policy tests, release checklist. **Not yet run on a device** |
-| 7 UI overhaul (good-news identity) | Planned: see `ui-overhaul.md`; needs owner brand choices |
+| 7 UI overhaul (good-news identity) | Built with default brand choices: theme tokens, fonts, sunrise header and lead story, welcome, icons and splash, tests. Pending: device look, 5-second check, store graphics, final name/logo (`ui-overhaul.md`) |
 | 8 Release | Not started: signing, device checks, store listing |
 | A Web via static JSON | Built and verified locally (exporter, `StaticJsonStorySource`, web DB, build script, 9 tests; headless Chromium shows Today with live data). Published via GitHub Pages with a daily export workflow (decision 55); history carry-over is not done |
 | Future B: Remote rules and editorial loop | Future |

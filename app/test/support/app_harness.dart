@@ -50,7 +50,7 @@ const constructiveTitles = [
 
 /// A whole app instance on in-memory SQLite and a fake web, for widget/integration tests.
 class AppHarness {
-  AppHarness({Map<String, Route>? routes, this.sourceCount = 4, this.online = true, this.deadline}) {
+  AppHarness({Map<String, Route>? routes, this.sourceCount = 4, this.online = true, this.deadline, this.showWelcome = false}) {
     this.routes = routes ?? defaultRoutes();
     db = AppDatabase(NativeDatabase.memory());
     client = MockClient((request) async {
@@ -62,6 +62,9 @@ class AppHarness {
   }
 
   final int sourceCount;
+
+  /// First run: show the welcome cards (off by default so flows start at Today).
+  final bool showWelcome;
 
   /// Flip to simulate losing or regaining the network.
   bool online;
@@ -101,6 +104,7 @@ class AppHarness {
         bundledSourcesProvider.overrideWith((ref) async => sources),
         linkOpenerProvider.overrideWithValue(links),
         sharerProvider.overrideWithValue(sharer),
+        if (!showWelcome) welcomeStateProvider.overrideWith(AlwaysSeenWelcome.new),
         if (deadline != null)
           ingestionServiceProvider.overrideWith((ref) async {
             final classification = await ref.watch(classificationServiceProvider.future);
@@ -117,6 +121,12 @@ class AppHarness {
   Widget get app => ProviderScope(retry: (_, _) => null, overrides: overrides, child: const GoodNewsApp());
 
   Future<void> dispose() => db.close();
+}
+
+/// Tests start past the first-run welcome unless they ask for it.
+class AlwaysSeenWelcome extends WelcomeState {
+  @override
+  bool build() => true;
 }
 
 /// Lets real async work (SQLite, fake HTTP) progress while widget time is controlled.
@@ -181,7 +191,9 @@ Future<void> openApp(WidgetTester tester, AppHarness h) async {
 
 /// Taps the first story card (its tappable area, not the save button).
 Future<void> tapFirstStory(WidgetTester tester) async {
-  final target = find.descendant(of: storyCards.first, matching: find.byType(InkWell)).first;
+  // Tap the headline: the card itself can be taller than a small screen at large text, so its
+  // centre may be off screen.
+  final target = find.descendant(of: storyCards.first, matching: find.byWidgetPredicate((w) => w is Text && w.style?.fontFamily == 'SourceSerif4')).first;
   await tester.ensureVisible(target); // on small screens with large text it may start below the fold
   await tester.pump(const Duration(milliseconds: 400));
   await tester.tap(target);

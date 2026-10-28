@@ -56,6 +56,8 @@ void main() {
       await tester.tap(saves.at(0));
       await settle(tester, rounds: 4);
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 1100))); // saved_at has second resolution
+      await tester.ensureVisible(find.byTooltip('Save story').first);
+      await tester.pump(const Duration(milliseconds: 400));
       await tester.tap(find.byTooltip('Save story').first);
       await settle(tester, rounds: 4);
       await goTo(tester, 'Saved');

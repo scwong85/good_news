@@ -10,6 +10,8 @@ import '../features/settings/about_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/story/story_screen.dart';
 import '../features/today/today_screen.dart';
+import '../features/welcome/welcome_overlay.dart';
+import 'providers.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   // One navigator key per router: a shared top-level key breaks multiple app instances (tests).
@@ -46,7 +48,7 @@ const _destinations = [
 ];
 
 /// Bottom navigation on phones, a navigation rail on tablets.
-class AppShell extends StatelessWidget {
+class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.shell});
   final StatefulNavigationShell shell;
 
@@ -62,7 +64,13 @@ class AppShell extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final seen = ref.watch(welcomeStateProvider);
+    final shellView = _layout(context);
+    return seen ? shellView : Stack(children: [shellView, const Positioned.fill(child: WelcomeOverlay())]);
+  }
+
+  Widget _layout(BuildContext context) {
     final wide = MediaQuery.sizeOf(context).width >= 720;
     if (wide) {
       return Scaffold(

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/brand.dart';
+import '../../app/copy.dart';
 import '../../app/providers.dart';
 import '../../app/theme.dart';
 import '../../core/providers.dart' show feedFreshnessProvider;
@@ -17,22 +19,18 @@ class TodayScreen extends ConsumerWidget {
     final state = ref.watch(todayControllerProvider);
     final controller = ref.read(todayControllerProvider.notifier);
     final now = ref.watch(clockProvider)();
-    final text = Theme.of(context).textTheme;
-    final scheme = Theme.of(context).colorScheme;
 
     final updated = state.lastUpdated == null ? null : 'Updated ${formatUpdated(state.lastUpdated!, now)}';
     final count = state.picks.length;
 
     final children = <Widget>[
-      Text('Today', style: text.pageTitle),
-      const SizedBox(height: 2),
-      Text(
-        [
+      _SunriseHeader(
+        greeting: greetingFor(now),
+        summary: [
           formatLongDay(now),
           if (count > 0) '$count ${count == 1 ? 'story' : 'stories'}',
           ?updated,
         ].join('  ·  '),
-        style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
       ),
       const SizedBox(height: 16),
       ..._banner(state),
@@ -50,6 +48,7 @@ class TodayScreen extends ConsumerWidget {
     } else if (state.picks.isEmpty) {
       children.add(EmptyState(
         icon: Icons.wb_twilight,
+        illustration: const SunriseMark(size: 96),
         title: 'No stories to show yet',
         message: state.issue == RefreshIssue.offline
             ? "You seem to be offline. We'll show today's stories as soon as we can reach the news sources."
@@ -60,9 +59,13 @@ class TodayScreen extends ConsumerWidget {
         ),
       ));
     } else {
-      for (final story in state.picks) {
+      for (var i = 0; i < state.picks.length; i++) {
+        final story = state.picks[i];
         children
-          ..add(StoryCard(story: story, onOpen: () => context.push('/story/${story.id}')))
+          ..add(FadeSlideIn(
+            delay: Duration(milliseconds: 40 * i.clamp(0, 6)),
+            child: StoryCard(story: story, lead: i == 0, onOpen: () => context.push('/story/${story.id}')),
+          ))
           ..add(const SizedBox(height: 12));
       }
       children.add(_EndOfToday(onExplore: () => context.go('/explore')));
@@ -125,6 +128,47 @@ class TodayScreen extends ConsumerWidget {
   }
 }
 
+class _SunriseHeader extends StatelessWidget {
+  const _SunriseHeader({required this.greeting, required this.summary});
+  final String greeting;
+  final String summary;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 16, 12, 16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [scheme.tertiaryContainer, scheme.secondaryContainer],
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(greeting, style: text.labelLarge?.copyWith(color: scheme.onTertiaryContainer)),
+                const SizedBox(height: 2),
+                Semantics(header: true, child: Text('Today', style: text.pageTitle.copyWith(color: scheme.onTertiaryContainer))),
+                const SizedBox(height: 4),
+                Text(summary, style: text.bodyMedium?.copyWith(color: scheme.onTertiaryContainer)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          const SunriseMark(size: 64),
+        ],
+      ),
+    );
+  }
+}
+
 class _Gathering extends StatelessWidget {
   const _Gathering();
 
@@ -152,18 +196,21 @@ class _EndOfToday extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      child: Column(
-        children: [
-          Icon(Icons.check_circle_outline, color: scheme.primary),
-          const SizedBox(height: 8),
-          Text("That's everything for today.", style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 4),
-          Text('Come back tomorrow for more.', style: TextStyle(color: scheme.onSurfaceVariant)),
-          const SizedBox(height: 12),
-          TextButton(onPressed: onExplore, child: const Text('Browse more in Explore')),
-        ],
+    final text = Theme.of(context).textTheme;
+    return FadeSlideIn(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+        child: Column(
+          children: [
+            const SunriseMark(size: 72),
+            const SizedBox(height: 12),
+            Text(endOfTodayTitle, style: text.titleLarge),
+            const SizedBox(height: 6),
+            Text(endOfTodayBody, textAlign: TextAlign.center, style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant, height: 1.4)),
+            const SizedBox(height: 12),
+            TextButton(onPressed: onExplore, child: const Text(browseMore)),
+          ],
+        ),
       ),
     );
   }

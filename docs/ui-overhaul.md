@@ -1,6 +1,6 @@
 # UI overhaul milestone (Phase 7): a design that feels like good news
 
-Status: **planned, not started.** Phase 5 gave us a correct, accessible, but deliberately plain Material 3 UI. This milestone gives the app its own identity so that opening it feels calm, hopeful and trustworthy, in line with `product-brief.md`. It changes how the app looks and feels, not what it does: no new data, permissions, network calls or tracking.
+Status: **built (2026-10-28), pending the owner's look on a real device.** The owner asked to start without choosing the brand details, so the working defaults are: name "Good News" (placeholder), green + sunrise-amber palette on warm cream, Source Serif 4 headlines with Nunito Sans text, an original sunrise mark. All of it is easy to change through the theme tokens (`app/lib/app/theme.dart`, `brand.dart`, `copy.dart`). Done: tokens and fonts, Today header with greeting and lead story, redesigned story cards (topic chip with icon, short "why" line), warm empty and end-of-list states, About trust badge, first-run welcome, gentle motion that respects reduce-motion, adaptive and themed icon, splash, web icons, predictive back. **Not done:** the informal "5-second" check with real people, measuring size/startup on a device, store graphics and screenshots, and a decision on the final name/logo. Phase 5 gave us a correct, accessible, but deliberately plain Material 3 UI. This milestone gives the app its own identity so that opening it feels calm, hopeful and trustworthy, in line with `product-brief.md`. It changes how the app looks and feels, not what it does: no new data, permissions, network calls or tracking.
 
 ## Design direction
 - **Feeling:** a quiet, sunny morning. Warm and optimistic, never saccharine, never "newsy red alert". Calm first, hopeful second, credible always.
@@ -55,6 +55,13 @@ Android adaptive icon and themed (monochrome) icon, native splash on the brand c
 - All existing tests plus new golden tests pass; accessibility guidelines pass in light and dark; no overflow at 200% text.
 - Budgets above met; no new permissions or network hosts (policy tests in `app/test/policy_test.dart` still pass).
 - The informal 5-second check meets the target above.
+
+## What was built (Phase 7)
+- **Tokens:** `theme.dart` (colour scheme, type, shapes, bars), `brand.dart` (sunrise and sprout drawn in code, topic icons and colours, `FadeSlideIn`), `copy.dart` (all new words in one place).
+- **Fonts:** variable Source Serif 4 and Nunito Sans bundled in `app/assets/fonts` (about 1.8 MB, SIL OFL, `docs/credits.md`); never fetched.
+- **Icons:** `scripts/make-icons.py` renders the launcher (legacy, adaptive, monochrome/themed), splash mark and web icons from one drawing; no third-party art.
+- **Tests:** `test/ui/design_test.dart` (welcome once/skip/returning reader, greeting, lead story, reduce-motion, topic styles) plus the Phase 5 accessibility, responsive and 200% text tests, all unchanged and passing.
+- **Checked visually** by rendering the web build in headless Chromium in light and dark.
 
 ## Open questions
 - Final app name, logo and brand colour (owner).

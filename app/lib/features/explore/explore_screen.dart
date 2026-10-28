@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/brand.dart';
 import '../../app/providers.dart';
 import '../shared/formatting.dart';
 import '../shared/widgets.dart';
@@ -123,6 +124,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     return ScrollableCenter(
                       child: EmptyState(
                         icon: Icons.search_off,
+                        illustration: const SproutMark(size: 84),
                         title: query.isEmpty ? 'Nothing here yet' : 'No stories match',
                         message: query.isEmpty
                             ? 'Open Today first so the app can fetch the latest stories.'

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/brand.dart';
+import '../../app/copy.dart';
 import '../../app/providers.dart';
 import '../../core/providers.dart';
 import '../shared/widgets.dart';
@@ -36,6 +38,19 @@ class AboutScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
+                margin: const EdgeInsets.only(bottom: 24),
+                decoration: BoxDecoration(color: scheme.secondaryContainer, borderRadius: BorderRadius.circular(20)),
+                child: Row(
+                  children: [
+                    const SunriseMark(size: 56),
+                    const SizedBox(width: 14),
+                    Expanded(child: Text(trustBadge, style: text.titleSmall?.copyWith(color: scheme.onSecondaryContainer, height: 1.35))),
+                  ],
+                ),
+              ),
               section('What this app is', [
                 'A small daily briefing of credible, constructive news: progress, solutions, recovery, '
                     'cooperation and discovery. It is not a filter that calls all news good or bad.',
