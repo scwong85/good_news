@@ -22,6 +22,8 @@ class SavedScreen extends ConsumerWidget {
         ..clearSnackBars()
         ..showSnackBar(SnackBar(
           content: const Text('Removed from saved'),
+          persist: false, // a SnackBar with an action otherwise stays until swiped away
+          duration: const Duration(seconds: 5),
           action: SnackBarAction(
             label: 'Undo',
             onPressed: () => ref.read(storyActionsProvider).toggleSaved(story, isSaved: false),
@@ -32,6 +34,7 @@ class SavedScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Saved')),
       body: saved.when(
+        skipLoadingOnReload: true,
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, _) => const EmptyState(icon: Icons.error_outline, title: "Couldn't load saved stories"),
         data: (stories) {

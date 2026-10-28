@@ -115,6 +115,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             const SizedBox(height: 4),
             Expanded(
               child: results.when(
+                skipLoadingOnReload: true, // keep the list (and scroll position) while it refreshes
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, _) => const EmptyState(icon: Icons.error_outline, title: "Couldn't load stories", message: 'Please try again in a moment.'),
                 data: (stories) {

@@ -52,6 +52,15 @@ class AppShell extends StatelessWidget {
 
   void _go(int i) => shell.goBranch(i, initialLocation: i == shell.currentIndex);
 
+  /// Swiping left goes to the next tab, right to the previous one. Scrollable children (the
+  /// topic chips, the slider) take their own horizontal drags first.
+  void _swipe(DragEndDetails d) {
+    final v = d.primaryVelocity ?? 0;
+    if (v.abs() < 300) return;
+    final next = (shell.currentIndex + (v < 0 ? 1 : -1)).clamp(0, _destinations.length - 1);
+    if (next != shell.currentIndex) _go(next);
+  }
+
   @override
   Widget build(BuildContext context) {
     final wide = MediaQuery.sizeOf(context).width >= 720;
@@ -69,13 +78,13 @@ class AppShell extends StatelessWidget {
               ],
             ),
             const VerticalDivider(width: 1),
-            Expanded(child: shell),
+            Expanded(child: GestureDetector(onHorizontalDragEnd: _swipe, child: shell)),
           ],
         ),
       );
     }
     return Scaffold(
-      body: shell,
+      body: GestureDetector(onHorizontalDragEnd: _swipe, child: shell),
       bottomNavigationBar: NavigationBar(
         selectedIndex: shell.currentIndex,
         onDestinationSelected: _go,

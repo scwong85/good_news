@@ -165,6 +165,8 @@ Future<void> _hide(BuildContext context, WidgetRef ref, Story story) async {
     ..clearSnackBars()
     ..showSnackBar(SnackBar(
       content: const Text('Story hidden on this phone'),
+      persist: false,
+      duration: const Duration(seconds: 5),
       action: SnackBarAction(
         label: 'Undo',
         onPressed: () async {
