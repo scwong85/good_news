@@ -16,8 +16,7 @@ Calm, trustworthy app that gives a small daily briefing (5-10 stories, user sett
 - Fetch-on-open only; no background sync. Be a polite client: User-Agent, cache TTL 30 min, conditional GET, honor 429/Retry-After.
 - Privacy: no accounts, analytics or ads; data stays on the device; telemetry only if opt-in.
 - No LLM dependency.
-- The web milestone is started: build it (`scripts/build-web.sh`), but do not publish/host it, add a scheduler or CI, or add servers until the owner asks for that step. No server we operate, ever, without the owner.
-- Don't add CI workflows until the owner asks.
+- The web app is published to GitHub Pages by the one workflow the owner asked for (`.github/workflows/pages.yml`: daily export + deploy). Don't add other CI workflows, servers or schedulers until the owner asks. No server we operate, ever, without the owner.
 - Roadmap after Phase 5: Phase 6 hardening (done in code), Phase 7 UI overhaul (`docs/ui-overhaul.md`, planned), Phase 8 release (`docs/release-checklist.md`).
 
 ## Workflow

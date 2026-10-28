@@ -50,6 +50,7 @@ Status: **active**, or **superseded by #n**.
 | 48 | Privacy policy canonical in `docs/legal/privacy-policy.md`, copied to the app asset by `scripts/sync-legal.sh` (checked by dev-check). Contact address comes from `--dart-define=CONTACT_EMAIL`; the contact tile is hidden when unset, and a release must set it (release checklist) | 2026-10-28 | active |
 | 49 | Hardening enforced by tests: only the INTERNET permission, no services/receivers/providers, `allowBackup=false`, no cleartext, banned analytics/ads/background packages. No telemetry or crash reporting | 2026-10-28 | active |
 | 50 | Roadmap: Phase 6 hardening, **Phase 7 UI overhaul** (`ui-overhaul.md`), Phase 8 release. Web stays future milestone A | 2026-10-28 | active |
+| 55 | Owner asked for the daily export and publishing (2026-10-28): one workflow, `.github/workflows/pages.yml` (push to main + daily cron + manual), GitHub Pages via Actions, base href from the repo name, `CONTACT_EMAIL` from a repository variable. Every run also runs analyze and the tests. No history carry-over between exports yet | 2026-10-28 | active |
 | 51 | Web milestone A started by the owner (2026-10-28). The same Flutter app builds for web (`app/web/`); `kIsWeb` swaps `DirectRssStorySource` for `StaticJsonStorySource`; Drift runs on WebAssembly SQLite (`sqlite3.wasm` + compiled `drift_worker.js` committed in `app/web/`). Publishing, a scheduler and CI are still not done (owner decision) | 2026-10-28 | active |
 | 52 | The exporter is a Dart tool, not the Python/Django prototype: it reuses the app's own fetch/parse/normalize/classify code (no drift between app and export, no Postgres to run). The Python pipeline stays the rules-evaluation reference. The web app re-classifies locally; exported classification is informational | 2026-10-28 | active |
 | 53 | Web build uses `--no-web-resources-cdn` (bundled CanvasKit and fonts) so a visit makes only same-origin requests; checked in headless Chromium. Hash routing (go_router default); `404.html` copy of `index.html` for Pages | 2026-10-28 | active |
@@ -85,6 +86,6 @@ Status: **active**, or **superseded by #n**.
 | 6 Android hardening | Done in code: hide/report with local source penalties (DB v4), Hidden stories, in-app privacy policy, contact config, manifest hardening and policy tests, release checklist. **Not yet run on a device** |
 | 7 UI overhaul (good-news identity) | Planned: see `ui-overhaul.md`; needs owner brand choices |
 | 8 Release | Not started: signing, device checks, store listing |
-| A Web via static JSON | Built and verified locally (exporter, `StaticJsonStorySource`, web DB, build script, 9 tests; headless Chromium shows Today with live data). **Not published**: hosting choice, scheduler/CI and history carry-over need the owner |
+| A Web via static JSON | Built and verified locally (exporter, `StaticJsonStorySource`, web DB, build script, 9 tests; headless Chromium shows Today with live data). Published via GitHub Pages with a daily export workflow (decision 55); history carry-over is not done |
 | Future B: Remote rules and editorial loop | Future |
 | Future C: Optional extras (ML, LLM, iOS, server) | Future |

@@ -1,0 +1,56 @@
+# Builds the web app, exports a fresh static news feed and publishes both to GitHub Pages.
+# Runs on every push to main, every day, and on demand. One-time setup (repository settings):
+#   Settings > Pages > Build and deployment > Source: "GitHub Actions"
+# Optional repository variable CONTACT_EMAIL: shown on the privacy page of the web app.
+name: Publish web app
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 5 * * *" # daily, 05:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Check
+        working-directory: app
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter test
+      - name: Export the news feed and build the site
+        env:
+          CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
+        run: scripts/build-web.sh --base-href "/${GITHUB_REPOSITORY#*/}/"
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/build/site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
